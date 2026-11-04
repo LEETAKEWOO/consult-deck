@@ -1716,6 +1716,17 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .sch-own{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-radius:12px;background:var(--bg);border:1px dashed var(--line)}
 .sch-own label{font-size:13px;font-weight:700;color:var(--muted)}
 .sch-own input{border:1px solid var(--line);border-radius:10px;padding:7px 10px;font:inherit;font-size:14px;background:var(--card);color:inherit}
+/* 폰·아이패드 연동 */
+.fset.sy{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;gap:10px;margin-bottom:14px}
+.fset.sy .ghost{background:var(--bg);border:1px solid var(--line)}
+.sy-line{margin:0;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.sy-line span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;background:#b9bec8;vertical-align:1px}
+.sy-line .sy-ok::before{background:#1f9d6b}.sy-line .sy-busy::before{background:#e8892b}.sy-line .sy-err::before{background:#d64545}.sy-line .sy-wait::before{background:#e8892b}
+.sy-line .sy-err{color:#c03a3a}
+.fset.sy .sf input{text-align:left}
+.sy-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+.sy-help{margin:2px 0 0;font-size:12.5px;color:var(--muted);line-height:1.55}
+.sch-note .sy-err{color:#c03a3a}.sch-note .sy-ok{color:#1f9d6b}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -1758,7 +1769,7 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-body" role="dialog" aria-label="설정">
     <header><h3>설정</h3><button class="ghost" data-act="closeSheet">닫기</button></header>
-    <p class="note-s">여기서 바꾼 프로필·주소·기준 금액은 이 기기 브라우저에만 저장돼요. 상담 중 넣은 금액은 저장하지 않고, 새로고침하면 지워져요.</p>
+    <p class="note-s">여기서 바꾼 프로필·주소·기준 금액은 이 기기에 저장되고, 연동을 켜면 폰·아이패드에 같이 맞춰져요. 상담 중 넣은 금액은 저장하지 않고, 새로고침하면 지워져요.</p>
     <div id="sheetFields"></div>
     <div class="btns"><button class="ghost" data-act="openQ">필수 질문 리스트</button><button class="ghost" data-act="showLaunch">시작 선택 화면</button><button class="ghost" data-act="resetCfg">기본값으로 되돌리기</button><button class="ghost" data-act="newSession">새 상담 시작</button></div>
   </div>
@@ -1779,7 +1790,7 @@ var DEF = {
 };
 var cfg = Object.assign({}, DEF);
 try{ var sv = JSON.parse(localStorage.getItem("tc-deck-cfg")||"null"); if(sv) Object.assign(cfg, sv); }catch(e){}
-function saveCfg(){ try{ localStorage.setItem("tc-deck-cfg", JSON.stringify(cfg)); }catch(e){} }
+function saveCfg(){ cfgStamp(); storeLocal(); syncSoon(); }
 
 /* ================= 상담 상태(저장 안 함) ================= */
 var S;
@@ -2970,10 +2981,99 @@ var ANAL_PAGE={title:"보장분석 확인표", html:function(){
    N("say","새로 더하는 것보다 지금 보험을 정리하면서 빈칸을 채우는 게 보험료가 덜 드는 경우가 많아요. 다시 설계해서 비교해 드릴게요.")+
    '<h4 style="margin-top:12px">증권 볼 때 확인할 것</h4><ul><li>CI보험: ‘중대한’ 조건, 주계약 하나 받으면 나머지 소멸 여부</li><li>납입기간 · 담보별 갱신형 여부</li><li>보장기간 80 / 90 / 100세</li><li>갱신형: 앞으로 오를 보험료, 만기까지 총 납입액</li><li>저축·연금: 최저보증이율, 돈이 필요한 시점</li><li>운전자: 교통사고처리지원금 1억 이상, 벌금 3,000만, 변호사선임비 2,000만</li><li>변액: 해지환급금·수익률, 펀드 관리 여부</li><li>뇌·심장: 좁은 담보면 넓은 담보로 옮기기 제안</li><li>입원일당: 20세 미만 자녀는 5만원 이상, 성인은 우선순위 낮음</li></ul>'; }};
 
-/* ================= 상담 일정 (이 기기에만 저장) ================= */
+/* ================= 상담 일정 + 폰·아이패드 연동 ================= */
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function schNorm(o){ o=o||{}; var e=(o.e||[]).filter(function(x){ return x&&x.d&&x.t; }).map(function(x){ return {id:x.id||uid(), d:x.d, t:x.t, n:x.n||"", u:x.u||0, x:!!x.x}; }), off={};
+  Object.keys(o.off||{}).forEach(function(k){ var v=o.off[k]; off[k]=(v&&typeof v==="object")? {v:!!v.v,u:v.u||0} : {v:!!v,u:0}; });
+  return {e:e, off:off}; }
 var SCH={e:[],off:{}};
-try{ var sv2=JSON.parse(localStorage.getItem("tc-deck-sched")||"null"); if(sv2&&sv2.e) SCH=sv2; if(!SCH.off) SCH.off={}; }catch(e){}
-function schSave(){ try{ localStorage.setItem("tc-deck-sched", JSON.stringify(SCH)); }catch(e){} }
+try{ var sv2=JSON.parse(localStorage.getItem("tc-deck-sched")||"null"); if(sv2&&sv2.e) SCH=sv2; }catch(e){}
+SCH=schNorm(SCH);
+function schLive(){ return SCH.e.filter(function(x){ return !x.x; }); }
+function isOff(k){ return !!(SCH.off[k]&&SCH.off[k].v); }
+function storeLocal(){ try{ localStorage.setItem("tc-deck-sched", JSON.stringify(SCH)); localStorage.setItem("tc-deck-cfg", JSON.stringify(cfg)); localStorage.setItem("tc-deck-cfgt", JSON.stringify(CFG_T)); }catch(e){} }
+function schSave(){ storeLocal(); syncSoon(); }
+
+/* 설정이 바뀐 항목만 시간을 찍어 둬요 (기기끼리 최신 값으로 맞추기 위해) */
+var CFG_T={}; try{ CFG_T=JSON.parse(localStorage.getItem("tc-deck-cfgt")||"{}")||{}; }catch(e){ CFG_T={}; }
+var cfgPrev={}; Object.keys(cfg).forEach(function(k){ cfgPrev[k]=JSON.stringify(cfg[k]); });
+Object.keys(cfg).forEach(function(k){ if(!(k in CFG_T)&&(k in DEF)&&JSON.stringify(cfg[k])!==JSON.stringify(DEF[k])) CFG_T[k]=1; });
+function cfgStamp(){ var t=Date.now(); Object.keys(cfg).forEach(function(k){ var s=JSON.stringify(cfg[k]); if(s!==cfgPrev[k]){ CFG_T[k]=t; cfgPrev[k]=s; } }); }
+
+/* ---- 기기 연동 (GitHub 비공개 저장소의 data.json 하나를 같이 써요) ---- */
+var SY={tok:"",repo:"LEETAKEWOO/consult-data",st:"off",last:0,msg:"",busy:false,again:false};
+try{ var s3=JSON.parse(localStorage.getItem("tc-sync")||"null"); if(s3){ SY.tok=s3.tok||""; SY.repo=s3.repo||SY.repo; SY.last=s3.last||0; } }catch(e){}
+SY.st=SY.tok?"idle":"off";
+function sySave(){ try{ localStorage.setItem("tc-sync", JSON.stringify({tok:SY.tok,repo:SY.repo,last:SY.last})); }catch(e){} }
+function b64e(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64d(s){ return decodeURIComponent(escape(atob((s||"").replace(/\s/g,"")))); }
+function ghReq(method,body){ return fetch("https://api.github.com/repos/"+SY.repo+"/contents/data.json"+(method==="GET"?"?t="+Date.now():""),
+  {method:method, cache:"no-store", headers:{"Authorization":"Bearer "+SY.tok, "Accept":"application/vnd.github+json"}, body:body?JSON.stringify(body):undefined}); }
+function mergeSched(r){ r=schNorm(r); var map={}, ch=false; SCH.e.forEach(function(x){ map[x.id]=x; });
+  r.e.forEach(function(x){ var l=map[x.id]; if(!l||x.u>l.u){ map[x.id]=x; ch=true; } });
+  SCH.e=Object.keys(map).map(function(k){ return map[k]; });
+  Object.keys(r.off).forEach(function(k){ var l=SCH.off[k]; if(!l||r.off[k].u>l.u){ SCH.off[k]=r.off[k]; ch=true; } });
+  return ch; }
+function mergeCfg(r){ var t=(r&&r.t)||{}, v=(r&&r.vals)||{}, ch=false;
+  Object.keys(t).forEach(function(k){ if(!(k in DEF)) return; if(t[k]>(CFG_T[k]||0)){ cfg[k]=v[k]; CFG_T[k]=t[k]; cfgPrev[k]=JSON.stringify(cfg[k]); ch=true; } });
+  return ch; }
+function payload(){ var old=Date.now()-60*864e5;
+  SCH.e=SCH.e.filter(function(x){ return !(x.x&&x.u<old); });
+  var e=SCH.e.slice().sort(function(a,b){ return a.id<b.id?-1:a.id>b.id?1:0; }), off={};
+  Object.keys(SCH.off).sort().forEach(function(k){ off[k]=SCH.off[k]; });
+  var vals={}, t={}; Object.keys(CFG_T).sort().forEach(function(k){ if(k in cfg){ vals[k]=cfg[k]; t[k]=CFG_T[k]; } });
+  return {v:1, sched:{e:e, off:off}, cfg:{vals:vals, t:t}}; }
+var syT=null, syPend=false;
+function syncSoon(){ if(!SY.tok) return; clearTimeout(syT); syT=setTimeout(syncNow,1200); }
+function syncNow(){
+  if(!SY.tok||!SY.repo) return Promise.resolve();
+  if(SY.busy){ SY.again=true; return Promise.resolve(); }
+  if(navigator.onLine===false){ SY.st="wait"; syUI(); return Promise.resolve(); }
+  SY.busy=true; SY.st="busy"; syUI();
+  var tries=0, changed=false;
+  function round(){ tries++;
+    return ghReq("GET").then(function(r){
+      if(r.status===404) return {sha:null, raw:""};
+      if(r.status===401||r.status===403) throw {k:"auth"};
+      if(!r.ok) throw {k:"net"};
+      return r.json().then(function(j){ return {sha:j.sha, raw:b64d(j.content)}; });
+    }).then(function(rem){
+      var d=null; try{ d=rem.raw?JSON.parse(rem.raw):null; }catch(e){ d=null; }
+      if(d){ var c1=mergeSched(d.sched||{}), c2=mergeCfg(d.cfg||{}); if(c1||c2){ changed=true; storeLocal(); } }
+      var ps=JSON.stringify(payload());
+      if(d&&ps===rem.raw) return;
+      var body={message:"동기화", content:b64e(ps)}; if(rem.sha) body.sha=rem.sha;
+      return ghReq("PUT",body).then(function(r){
+        if(r.status===409||r.status===422){ if(tries<4) return round(); throw {k:"conf"}; }
+        if(r.status===401||r.status===403) throw {k:"auth"};
+        if(r.status===404) throw {k:"repo"};
+        if(!r.ok) throw {k:"net"};
+        storeLocal();
+      });
+    }); }
+  return round().then(function(){ SY.st="ok"; SY.last=Date.now(); SY.msg=""; sySave(); if(changed) softRender(); },
+    function(e){ SY.st="err"; SY.msg= e&&e.k==="auth"? "연동 열쇠가 맞지 않거나 만료됐어요" : e&&e.k==="repo"? "저장소를 찾을 수 없어요" : e&&e.k==="conf"? "다른 기기와 동시에 저장돼서 곧 다시 맞출게요" : "인터넷이 불안정해요 · 연결되면 다시 맞출게요"; })
+   .then(function(){ SY.busy=false; syUI(); if(SY.again){ SY.again=false; syncSoon(); } }); }
+function softRender(){ var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){ syPend=true; return; }
+  syPend=false; if(!$("sheet").hidden) buildSheet(); render(false); }
+document.addEventListener("focusout",function(){ if(syPend) setTimeout(function(){ if(syPend) softRender(); },50); });
+function hm(ms){ var d=new Date(ms); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function syText(){ if(!SY.tok) return "일정은 이 기기에만 저장돼요";
+  if(SY.st==="busy") return "폰·아이패드와 맞추는 중…";
+  if(SY.st==="err") return "연동 확인 필요 · "+SY.msg;
+  if(SY.st==="wait") return "인터넷이 연결되면 맞출게요";
+  return SY.last? "폰·아이패드와 맞춰져 있어요 · "+hm(SY.last) : "폰·아이패드 연동 켜짐"; }
+function syUI(){ var els=document.querySelectorAll("[data-sy]"); for(var i=0;i<els.length;i++){ els[i].textContent=syText(); els[i].className="sy-"+(SY.tok?SY.st:"off"); } }
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") syncNow(); });
+window.addEventListener("online",function(){ syncNow(); });
+setInterval(function(){ if(document.visibilityState==="visible") syncNow(); },45000);
+if(SY.tok) setTimeout(syncNow,600);
+function syHTML(){ return '<div class="fset sy"><h4>폰·아이패드 연동</h4><p class="sy-line"><span data-sy class="sy-'+(SY.tok?SY.st:"off")+'">'+syText()+'</span></p>'+
+  (SY.tok? '<div class="sy-row"><button class="btn" data-act="syNow" id="sy-now">지금 맞추기</button><button class="ghost" data-act="syOff" id="sy-off">이 기기 연결 끊기</button></div>'
+   : '<label class="sf wide"><span>저장소</span><input id="sy-repo" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(SY.repo)+'"></label>'+
+     '<label class="sf wide"><span>연동 열쇠</span><input id="sy-tok" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_ 로 시작"></label>'+
+     '<div class="sy-row"><button class="btn" data-act="syOn" id="sy-on">연결</button></div>')+
+  '<p class="sy-help">한 번 연결해 두면, 인터넷이 될 때 상담 일정과 설정이 폰과 아이패드에 똑같이 맞춰져요.</p></div>'; }
 var SCH_T=["10:00","12:00","14:00","16:00","18:00","20:00"];
 function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function schSel(){ var now=new Date(), b=new Date(now.getFullYear(),now.getMonth()+(S.schM||0),1); return S.schDay||(S.schM?ymd(b):ymd(now)); }
@@ -2981,10 +3081,10 @@ function maskName(n){ n=(n||"").trim(); if(!n) return "고객"; return n.charAt(
 function schHTML(){ var now=new Date(), base=new Date(now.getFullYear(),now.getMonth()+(S.schM||0),1), y=base.getFullYear(), m=base.getMonth(), today=ymd(now);
   var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate(), sel=schSel();
   var cells=""; for(var i=0;i<first;i++) cells+='<span class="sd blank"></span>';
-  for(var d=1;d<=days;d++){ var k=ymd(new Date(y,m,d)), n=SCH.e.filter(function(x){ return x.d===k; }).length, past=k<today, off=!!SCH.off[k], dow=new Date(y,m,d).getDay();
+  for(var d=1;d<=days;d++){ var k=ymd(new Date(y,m,d)), n=schLive().filter(function(x){ return x.d===k; }).length, past=k<today, off=isOff(k), dow=new Date(y,m,d).getDay();
     cells+='<button class="sd'+(k===today?' today':'')+(k===sel?' on':'')+(past?' past':'')+(off?' off':'')+(dow===0?' sun':dow===6?' sat':'')+'" data-act="schDay" data-v="'+k+'" id="sd-'+k+'"'+(past?' disabled':'')+'><b>'+d+'</b>'+(off?'<em>마감</em>':n?'<i>'+Array(Math.min(n,4)+1).join('<s></s>')+'</i>':'')+'</button>'; }
-  var list=SCH.e.filter(function(x){ return x.d===sel; }).sort(function(a,b){ return a.t<b.t?-1:1; }), taken={}; list.forEach(function(x){ taken[x.t]=1; });
-  var selD=new Date(sel+"T00:00:00"), wd="일월화수목금토".charAt(selD.getDay()), offSel=!!SCH.off[sel], pick=S.schT||"";
+  var list=schLive().filter(function(x){ return x.d===sel; }).sort(function(a,b){ return a.t<b.t?-1:1; }), taken={}; list.forEach(function(x){ taken[x.t]=1; });
+  var selD=new Date(sel+"T00:00:00"), wd="일월화수목금토".charAt(selD.getDay()), offSel=isOff(sel), pick=S.schT||"";
   return '<div class="sch"><div class="sch-cal"><div class="sch-h"><button class="sch-nv" data-act="schM" data-v="-1" aria-label="이전 달"'+((S.schM||0)<=0?' disabled':'')+'>‹</button><b>'+y+'년 '+(m+1)+'월</b><button class="sch-nv" data-act="schM" data-v="1" aria-label="다음 달">›</button></div>'+
     '<div class="sch-w">'+"일월화수목금토".split("").map(function(w,i){ return '<span'+(i===0?' class="sun"':i===6?' class="sat"':'')+'>'+w+'</span>'; }).join("")+'</div><div class="sch-g">'+cells+'</div></div>'+
    '<div class="sch-day"><div class="sdh"><b>'+(selD.getMonth()+1)+'월 '+selD.getDate()+'일 ('+wd+')</b><button class="sch-off'+(offSel?' on':'')+'" data-act="schOff" data-v="'+sel+'" aria-pressed="'+offSel+'">'+(offSel?'마감 풀기':'이 날 마감')+'</button></div>'+
@@ -2992,8 +3092,8 @@ function schHTML(){ var now=new Date(), base=new Date(now.getFullYear(),now.getM
     '<div class="sch-ts">'+SCH_T.map(function(t){ var tk=!!taken[t]; return '<button class="st'+(tk?' tk':'')+(pick===t?' on':'')+'" data-act="schT" data-v="'+t+'" id="st-'+t.replace(":","")+'"'+(tk?' disabled':'')+'>'+t+(tk?'<em>예약됨</em>':'')+'</button>'; }).join("")+'</div>'+
     '<div class="sch-own"><label for="sch-time">원하는 시간 직접 입력</label><input type="time" id="sch-time" data-schtime="1" step="600" value="'+(pick&&SCH_T.indexOf(pick)<0?pick:"")+'"></div>'+
     '<div class="sch-add"><input id="sch-name" data-txt="schName" placeholder="고객 이름" value="'+esc(S.schName||"")+'"><button class="btn" data-act="schAdd" id="sch-add"'+(pick&&!taken[pick]?'':' disabled')+'>'+(pick? (taken[pick]?pick+' 이미 예약됨':pick+' 등록') :'시간을 골라 주세요')+'</button></div>')+
-    (list.length? '<ul class="sch-l">'+list.map(function(x,i){ return '<li><b>'+x.t+'</b><span>'+maskName(x.n)+' 님 상담</span><button data-act="schDel" data-v="'+x.d+'|'+x.t+'" aria-label="일정 지우기">×</button></li>'; }).join("")+'</ul>' : '')+
-    '<p class="sch-note">일정은 이 기기에만 저장돼요 · 이름은 가운데를 가려서 보여 줘요</p></div></div>'; }
+    (list.length? '<ul class="sch-l">'+list.map(function(x,i){ return '<li><b>'+x.t+'</b><span>'+maskName(x.n)+' 님 상담</span><button data-act="schDel" data-v="'+x.id+'" aria-label="일정 지우기">×</button></li>'; }).join("")+'</ul>' : '')+
+    '<p class="sch-note"><span data-sy class="sy-'+(SY.tok?SY.st:"off")+'">'+syText()+'</span> · 이름은 가운데를 가려서 보여 줘요</p></div></div>'; }
 
 var TOTAL = [
   {title:"증권 확인", html:function(){
@@ -3211,9 +3311,12 @@ document.addEventListener("click",function(e){
   else if(a==="schDay"){ S.schDay=b.dataset.v; S.schT=""; render(); }
   else if(a==="schM"){ S.schM=Math.max(0,(S.schM||0)+Number(b.dataset.v)); S.schDay=""; S.schT=""; render(); }
   else if(a==="schT"){ S.schT=(S.schT===b.dataset.v?"":b.dataset.v); render(); }
-  else if(a==="schAdd"){ var sd=schSel(); if(S.schT){ SCH.e.push({d:sd,t:S.schT,n:S.schName||""}); schSave(); S.memo=sd+" "+S.schT; S.schT=""; S.schName=""; render(); } }
-  else if(a==="schDel"){ var pr=b.dataset.v.split("|"); SCH.e=SCH.e.filter(function(x){ return !(x.d===pr[0]&&x.t===pr[1]); }); schSave(); render(); }
-  else if(a==="schOff"){ var od=b.dataset.v; if(SCH.off[od]) delete SCH.off[od]; else SCH.off[od]=true; schSave(); render(); }
+  else if(a==="schAdd"){ var sd=schSel(); if(S.schT){ SCH.e.push({id:uid(),d:sd,t:S.schT,n:S.schName||"",u:Date.now(),x:false}); schSave(); S.memo=sd+" "+S.schT; S.schT=""; S.schName=""; render(); } }
+  else if(a==="schDel"){ var did=b.dataset.v; SCH.e.forEach(function(x){ if(x.id===did){ x.x=true; x.u=Date.now(); } }); schSave(); render(); }
+  else if(a==="schOff"){ var od=b.dataset.v; SCH.off[od]={v:!isOff(od),u:Date.now()}; schSave(); render(); }
+  else if(a==="syOn"){ var tk=($("sy-tok").value||"").trim(), rp=($("sy-repo").value||"").trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/+$/,""); if(!tk||!rp) return; SY.tok=tk; SY.repo=rp; SY.st="idle"; SY.last=0; sySave(); buildSheet(); syncNow(); }
+  else if(a==="syNow"){ syncNow(); }
+  else if(a==="syOff"){ SY.tok=""; SY.st="off"; SY.last=0; sySave(); buildSheet(); syUI(); }
   else if(a==="ckc"){ S.ckc=S.ckc||{}; var ck2=b.dataset.k; S.ckc[ck2]=(S.ckc[ck2]===b.dataset.v?"":b.dataset.v); render(); }
   else if(a==="ckOff"){ S.ckOpen=S.ckOpen||{}; S.ckOpen[b.dataset.v]=!S.ckOpen[b.dataset.v]; render(); }
   else if(a==="ck"){ S.ck=S.ck||{}; var ckk=b.dataset.k; S.ck[ckk]=(S.ck[ckk]===b.dataset.v?"":b.dataset.v); render(); }
@@ -3480,7 +3583,7 @@ function buildSheet(){
     ["암 진단 후 비용 (만원)",[["nonCov","비급여 치료비"],["months","생활비 개월 수"],["careDay","간병비 하루"],["careDays","간병 한 달 일수"],["careMonths","간병 개월 수"],["nursing","요양비 한 달"],["nursingMonths","요양 개월 수"],["follow","추적검진비"]]],
     ["노후",[["retire","정년 (세)"],["lifeM","남편 기대수명 (세)"],["lifeF","아내 기대수명 (세)"],["healthyAge","건강수명 (세)"],["coupleCost","부부 월 생활비 (만원)"],["singleCost","혼자 월 생활비 (만원)"],["infl","연 물가상승률 (%) · 기본은 지난 10년 평균"],["saveRate","적금 금리 (%)"]]]
   ];
-  $("sheetFields").innerHTML='<div class="fset"><h4>프로필 사진</h4><div class="photo">'+avatar().replace('class="av"','class="av"')+'<label class="ghost" for="cfg-photo">사진 고르기</label><input type="file" id="cfg-photo" accept="image/*">'+(cfg.photo?'<button class="ghost" data-act="removePhoto">사진 지우기</button>':'')+'</div></div>'+
+  $("sheetFields").innerHTML=syHTML()+'<div class="fset"><h4>프로필 사진</h4><div class="photo">'+avatar().replace('class="av"','class="av"')+'<label class="ghost" for="cfg-photo">사진 고르기</label><input type="file" id="cfg-photo" accept="image/*">'+(cfg.photo?'<button class="ghost" data-act="removePhoto">사진 지우기</button>':'')+'</div></div>'+
     groups.map(function(g){ return '<div class="fset"><h4>'+g[0]+'</h4>'+g[1].map(function(f){ return '<label class="sf'+(g[2]?" wide":"")+'"><span>'+f[1]+'</span><input id="cfg-'+f[0]+'" data-cfg="'+f[0]+'" '+(g[2]?'':'inputmode="decimal" ')+'value="'+esc(cfg[f[0]])+'"'+(f[0]==="ytUrl"?' placeholder="https://www.youtube.com/@채널"':'')+'></label>'; }).join("")+'</div>'; }).join("");
 }
 
