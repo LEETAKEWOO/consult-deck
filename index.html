@@ -1771,6 +1771,45 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .jdis.go .jd{cursor:pointer;transition:transform .15s,box-shadow .15s}
 .jdis.go .jd:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .jdis .ja{font-weight:800;color:var(--c)}
+/* 병원비: 자주 아픈 곳 줄 */
+.jbody{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.jbody .jbl{font-size:13px;font-weight:800;margin-right:4px;opacity:.75}
+.jq.end .jbody .jbl{color:#fff}
+.jbody .jb{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border-radius:999px;background:var(--bg);color:var(--ink);border:0;font:inherit}
+.jbody .jb .ji{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,var(--bg));color:var(--c)}
+.jbody .jb .ji svg{width:16px;height:16px}
+.jbody .jb b{font-size:14px;font-weight:700}
+.jbody.go .jb{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.jbody.go .jb:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+/* 자주 아픈 곳 페이지 */
+.bd-sw{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.bd-sw{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.bd-t{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:16px;border:0;background:var(--card);color:var(--muted);font:inherit;cursor:pointer;transition:background .15s,color .15s}
+.bd-t .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--bg);color:var(--c)}
+.bd-t .ic svg{width:20px;height:20px}
+.bd-t b{font-size:13.5px;font-weight:700;white-space:nowrap}
+.bd-t.on{background:var(--c);color:#fff}
+.bd-t.on .ic{background:rgba(255,255,255,.18);color:#fff}
+.bd-ans{align-items:center;text-align:center;padding:26px;gap:6px}
+.bd-ans b{font-size:clamp(40px,5vw,60px);font-weight:800;letter-spacing:-.04em;color:var(--muted2);line-height:1.1}
+.bd-ans.open{background:color-mix(in srgb,var(--tc) 12%,var(--card))}
+.bd-ans.open b{color:var(--tc)}
+.bd-k{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:800;color:var(--tc)}
+.bd-k::after{content:"";flex:1;height:1px;background:var(--line)}
+.bd-cv{display:grid;gap:12px;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+.bd-cv.n1{--n:1}.bd-cv.n2{--n:2}.bd-cv.n3{--n:3}
+@media (max-width:700px){.bd-cv{grid-template-columns:minmax(0,1fr)}}
+.bd-c{position:relative;display:flex;flex-direction:column;gap:6px;padding:22px 24px;border-radius:20px;background:color-mix(in srgb,var(--c) 9%,var(--card));min-height:150px}
+.bd-c .bd-n{font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--c)}
+.bd-c b{font-size:clamp(22px,2.4vw,28px);font-weight:800;letter-spacing:-.035em;line-height:1.25}
+.bd-c em{font-style:normal;font-size:15px;font-weight:700;color:var(--ink2)}
+.bd-c .fs{position:absolute;top:18px;right:18px}
+.fs{font-size:12.5px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.fs.y{background:var(--ok-soft);color:var(--ok)}.fs.n{background:var(--warn-soft);color:var(--warn)}
+.fs.u{background:rgba(232,137,43,.14);color:#B5651D}.fs.c{background:rgba(232,137,43,.14);color:#B5651D}
+.bd-pt{border:0;font:inherit;cursor:pointer;text-align:center;padding:18px 20px;border-radius:18px;background:var(--navy);color:#fff}
+.bd-pt b{font-size:clamp(18px,2vw,22px);font-weight:800;letter-spacing:-.03em}
+.bd-pt .tap{color:#FFB46E}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -2079,7 +2118,9 @@ var JSUB = ["","실손","실손","","","후유장해","",""];
 var JDIS=[["brain","뇌 질환"],["heart","심장 질환"],["vessel","혈관 질환"],["cancer","암 질환"]];
 function jDis(click){ return '<div class="jdis'+(click?' go':'')+'">'+JDIS.map(function(d){ var t=TABS[tabIdx(d[0])];
   return click? '<button class="jd" data-act="jgo" data-v="'+d[0]+'" id="jd-'+d[0]+'" style="--c:'+t.c+'"><span class="ji">'+ico(t.ic)+'</span><b>'+d[1]+'</b><span class="ja" aria-hidden="true">→</span></button>'
-    : '<span class="jd" style="--c:'+t.c+'"><span class="ji">'+ico(t.ic)+'</span><b>'+d[1]+'</b></span>'; }).join("")+'</div>'; }
+    : '<span class="jd" style="--c:'+t.c+'"><span class="ji">'+ico(t.ic)+'</span><b>'+d[1]+'</b></span>'; }).join("")+'</div>'+
+  '<div class="jbody'+(click?' go':'')+'"><span class="jbl">자주 아픈 곳</span>'+BODY.map(function(x){ var inner='<span class="ji">'+ico("b_"+x.id)+'</span><b>'+x.nm+'</b>';
+    return click? '<button class="jb" data-act="jgoB" data-v="'+x.id+'" id="jb-'+x.id+'" style="--c:'+x.c+'">'+inner+'</button>' : '<span class="jb" style="--c:'+x.c+'">'+inner+'</span>'; }).join("")+'</div>'; }
 function pJourney(){
   var j=S.journey, L=JOURNEY.length, loop=j>=L, last=j===L-1;
   var q= loop? '진단받았을 때, 가장 무서운 질병은 뭘까요?' : last? '전이·재발이 되면, 어떤 일이 생길까요?' : JOURNEY[j+1][1];
@@ -3083,7 +3124,7 @@ var ANAL_PAGE={title:"보장분석 확인표", html:function(){
 
  notes:function(){ return N("say","증권은 개인정보라 실명 인증이 필요해요. 카카오톡으로 인증 보내 드리면 한 번만 눌러 주세요.")+
    N("tip","증권을 보면서 항목마다 ‘되어 있음 / 없음 / 확인 필요’만 눌러요. 금액이 기준보다 한참 적으면 ‘확인 필요’로 두고 설명해요. ‘꼭 챙길 담보’ 표시는 다음 탭(생활습관 검사)을 하고 나면 붙어요. 검사 뒤에 다시 와서 보면 빈칸이 더 또렷해져요.")+
-   N("tip","처음엔 모든 묶음이 접혀 있어요. 고객이 가입한 보험만 묶음을 눌러 펼친 뒤 체크해요. 접힌 묶음은 개수에서 빠져요.")+N("tip","‘되어 있음’이나 ‘확인 필요’를 누르면, 그 담보 아래에 ‘넓게 보장되는 기준’이 펼쳐져요. 예: 후유장해는 3%부터 나와야 넓은 것, 80% 이상(고도)만이면 좁은 것. 증권·약관을 보고 ‘보장 / 보장 안 됨’을 눌러요. ‘놓치기 쉬움’ 표시 4개(치매·장기요양, 재진단암, 심혈관질환, 납입면제)는 보장분석표 양식에는 없지만 빠지면 보상을 못 받을 수 있는 항목이에요. 조건은 상품마다 달라서 일반적인 기준으로만 적었어요.")+N("tip","다 체크했으면 ‘고객에게 보여 주기’를 눌러요. ✓·✕·?만 크게 보여서, 빈칸이 한눈에 보여요.")+
+   N("tip","처음엔 모든 묶음이 접혀 있어요. 고객이 가입한 보험만 묶음을 눌러 펼친 뒤 체크해요. 접힌 묶음은 개수에서 빠져요.")+N("tip","‘되어 있음’이나 ‘확인 필요’를 누르면, 그 담보 아래에 ‘넓게 보장되는 기준’이 펼쳐져요. 예: 후유장해는 3%부터 나와야 넓은 것, 80% 이상(고도)만이면 좁은 것. 증권·약관을 보고 ‘보장 / 보장 안 됨’을 눌러요. ‘놓치기 쉬움’ 표시 4개(치매·장기요양, 재진단암, 심혈관질환, 납입면제)는 보장분석표 양식에는 없지만 빠지면 보상을 못 받을 수 있는 항목이에요. 조건은 상품마다 달라서 일반적인 기준으로만 적었어요.")+
    N("tip","실손은 증권의 가입일(계약일)을 ‘실손 가입일’ 칸에 넣으면 세대와 지금 불리한 점이 나와요. 넣으면 실손 ‘되어 있음’과 세대 기준(1·2세대면 보장)이 자동으로 체크돼요. 2009년 8~9월 가입은 보험사마다 표준화 시점이 달라 증권의 자기부담률로 세대를 확인해요.")+
    N("tip","1세대·초기 2세대(2013년까지)는 5세대로 바꾸면 3년간 보험료 50% 할인이 있어요(2026년 5월~). 다만 1세대는 자기부담이 거의 없어서 병원을 자주 가는 분은 유지가 나을 수 있어요. 바꿀지는 고객이 직접 따져 보게 하고, 좋은 점도 같이 말해 주기.")+
    N("q","보시면 ✕가 비어 있는 곳이에요. 특히 앞에서 생활습관 때문에 꼭 챙기자고 한 담보 중에 빈칸이 이만큼이에요. 어떻게 느껴지세요?")+
@@ -3263,6 +3304,50 @@ var TOTAL = [
 ];
 TOTAL.splice(0,1);
 /* ================= 탭 ================= */
+/* ================= 자주 아픈 곳 (부위별 꼭 필요한 담보) ================= */
+var FI={
+ spine:'<rect x="8.5" y="2.5" width="7" height="3.6" rx="1.2"/><rect x="8.5" y="8" width="7" height="3.6" rx="1.2"/><rect x="8.5" y="13.5" width="7" height="3.6" rx="1.2"/><rect x="9.5" y="19" width="5" height="2.6" rx="1"/>',
+ knee:'<path d="M7.5 2.5 10.6 9.4"/><path d="M13.4 14.6 16.5 21.5"/><circle cx="12" cy="12" r="2.9"/><path d="M5.6 3.4 8.7 10.2M15.3 13.8l3.1 6.8" opacity=".45"/>',
+ eye:'<path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.8"/>',
+ gut:'<path d="M6 4h11a2.5 2.5 0 0 1 0 5H8a2.5 2.5 0 0 0 0 5h9a2.5 2.5 0 0 1 0 5H9"/><path d="M9 19v2"/>',
+ bone:'<path d="M8.2 6.4a2 2 0 1 0-1.8 1.8L15.8 17.6a2 2 0 1 0 1.8-1.8z"/>',
+ tooth:'<path d="M8 3C5.5 3 4 5 4 7.5c0 3 1.5 5 2 8 .4 2.5 1 5.5 2.5 5.5s1.5-4 3.5-4 2 4 3.5 4 2.1-3 2.5-5.5c.5-3 2-5 2-8C20 5 18.5 3 16 3c-1.8 0-2.6 1-4 1S9.8 3 8 3z"/>'
+};
+Object.keys(FI).forEach(function(k){ IC["b_"+k]=FI[k]; });
+var BODY=[
+ {id:"spine", nm:"허리·목", c:"#6D52C7", ev:"디스크·협착증", q:"허리 디스크로 수술하면,<br>어디서 보장받을까요?", pt:"디스크는 질병이에요 · 상해 수술비로는 안 나와요",
+  cv:[["su2","질병 수술비","척추 수술"],["ba1","실손","주사·시술·도수"]]},
+ {id:"knee", nm:"무릎·어깨", c:"#0E8F8F", ev:"연골·인대·인공관절", q:"무릎·어깨가 아프면,<br>어떤 보장이 필요할까요?", pt:"닳으면 질병, 다치면 상해 · 둘 다 있어야 해요",
+  cv:[["su2","질병 수술비","연골·인공관절"],["su3","상해 수술비","인대·골절"],["di2","상해후유장해","3%부터"]]},
+ {id:"eye", nm:"눈", c:"#2F6FD0", ev:"백내장 · 수술 1위", q:"우리나라에서 가장 많이 받는 수술,<br>뭘까요?", ans:"백내장", pt:"2025년 69만 건 · 수술 1위예요",
+  cv:[["su2","질병 수술비","백내장"],["ba1","실손","검사·치료"]]},
+ {id:"gut", nm:"장", c:"#2C7A4F", ev:"치질·용종·담낭", q:"내시경에서 용종을 떼면,<br>보험금이 나올까요?", pt:"용종 제거도 수술이에요 · 치질·담낭도 수술 순위 상위",
+  cv:[["su2","질병 수술비","용종·치질·담낭"],["ba1","실손","내시경·검사"]]},
+ {id:"bone", nm:"뼈", c:"#0B4C8C", ev:"골절", q:"뼈가 부러지면,<br>어떤 보장이 필요할까요?", pt:"깁스만 하면 수술비는 안 나와요",
+  cv:[["ba3","골절진단비","치아파절 포함"],["su3","상해 수술비","핀 고정"]]},
+ {id:"tooth", nm:"치아", c:"#C95F0A", ev:"충치·크라운·임플란트", q:"임플란트,<br>건강보험으로 보장될까요?", pt:"건강보험엔 치아가 없어요 · 따로 있어야 해요",
+  cv:[["x_th","치아 담보","보존·보철"]]}
+];
+function bodyIdx(id){ for(var i=0;i<BODY.length;i++) if(BODY[i].id===id) return i; return 0; }
+function bodySt(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k){ return opn[k]; }), g=CK_G[id], st=ckState(id);
+  if(st==="y"){ var bad=0; CKG.forEach(function(gg){ gg.r.forEach(function(r){ if(r[0]===id) (r[3]||[]).forEach(function(_,i){ if((S.ckc||{})[id+"_"+i]==="n") bad++; }); }); }); return bad? ["c","보장 안 되는 경우 있음"] : ["y","되어 있음"]; }
+  if(st==="n") return ["n","빈칸"];
+  if(st==="u") return ["u","확인 필요"];
+  if(used&&g&&!opn[g]) return ["n","없음"];
+  return null; }
+var BODY_PAGES=BODY.map(function(b,bi){ return {title:b.nm, html:function(){
+  var rk="bd_"+b.id, open=!!S.rev[rk];
+  var sw='<div class="bd-sw">'+BODY.map(function(x,xi){ return '<button class="bd-t'+(xi===bi?' on':'')+'" data-act="bodyGo" data-v="'+x.id+'" id="bd-'+x.id+'" style="--c:'+x.c+'" aria-pressed="'+(xi===bi)+'"><span class="ic">'+ico("b_"+x.id)+'</span><b>'+x.nm+'</b></button>'; }).join("")+'</div>';
+  var cards='<div class="bd-cv n'+b.cv.length+'">'+b.cv.map(function(c,ci){ var s=bodySt(c[0]);
+    return '<div class="bd-c" style="--c:'+b.c+'"><span class="bd-n num">'+String(ci+1).padStart(2,"0")+'</span><b>'+c[1]+'</b><em>'+c[2]+'</em>'+(s?'<span class="fs '+s[0]+'">'+s[1]+'</span>':'')+'</div>'; }).join("")+'</div>';
+  return '<div class="slide bd-page" style="--tc:'+b.c+'">'+head(b.nm+" · "+b.ev, b.q)+sw+
+    (b.ans? '<button class="card bd-ans'+(open?' open':'')+'" data-act="rev" data-k="'+rk+'" id="rev-'+rk+'"><span class="k">정답</span><b>'+(open?b.ans:'?')+'</b>'+(open?'':'<span class="tap">눌러서 보기</span>')+'</button>' : '')+
+    (b.ans&&!open? '' : '<div class="bd-k"><span>꼭 있어야 할 담보</span></div>'+cards)+
+    (b.ans&&!open? '' : '<button class="bd-pt" data-act="rev" data-k="'+rk+'_p" id="rev-'+rk+'_p">'+(S.rev[rk+"_p"]? '<b>'+b.pt+'</b>' : '<span class="tap">이게 빠지면? 눌러서 보기</span>')+'</button>')+
+    '</div>'; },
+  notes:function(){ return N("q","관심 있는 곳이 있으세요? 허리, 무릎, 눈, 장, 뼈, 치아 중에서요.")+N("say","암, 뇌, 심장이 멀게 느껴지셔도, 이런 데는 누구나 한 번쯤 병원에 가요. 여기서 꼭 있어야 할 담보가 빠져 있으면 제대로 못 받아요.")+
+    N("q",b.q.replace(/<br>/g," "))+(b.ans?N("a",b.ans):"")+N("say",b.pt)+
+    N("tip","위쪽 버튼으로 다른 부위로 바로 넘어갈 수 있어요. 보장분석 탭에서 체크하면 담보 카드에 ‘되어 있음 / 빈칸’이 같이 떠요."); }}; });
 var TABS = [
   {id:"start", name:"시작", ic:"start", c:"var(--t-start)", pages:[{title:"나는 잘 준비하고 있을까",html:pCover,notes:nCover},{title:"보험을 준비하는 순서",html:pJourney,notes:nJourney}]},
   {id:"cancer", name:"암", ic:"cancer", c:"var(--t-cancer)", pages:CANCER},
@@ -3271,6 +3356,7 @@ var TABS = [
   {id:"heart", name:"심장", ic:"heart", c:"var(--t-heart)", pages:HEART},
   {id:"surgery", name:"수술", ic:"surgery", c:"var(--t-surgery)", pages:SURG},
   {id:"disab", name:"후유장해", ic:"disab", c:"var(--t-disab)", pages:DISAB},
+  {id:"body", name:"자주 아픈 곳", ic:"b_spine", c:"#6D52C7", pages:BODY_PAGES},
   {id:"retire", name:"은퇴 후", ic:"pension", c:"var(--t-pension)", get pages(){ return retirePages(); }},
   {id:"anal", name:"보장분석", ic:"total", c:"var(--t-total)", pages:[ANAL_PAGE]},
   {id:"risk", name:"생활습관", ic:"vessel", c:"var(--t-vessel)", pages:[RISK_PAGE]},
@@ -3342,7 +3428,7 @@ function nextTarget(){ var tab=TABS[T], pg=tab.pages[P], last=lastOfTab(), n;
     if(pg===lp[lp.length-1]) return !S.seen.pen? "pen" : (anyHealthDone()? "total" : "journey");
     return null; }
   if(!last) return null;
-  if(tab.id==="start"||HEALTH.indexOf(tab.id)>=0) return nextHealth()||"end";
+  if(tab.id==="start"||tab.id==="body"||HEALTH.indexOf(tab.id)>=0) return nextHealth()||"end";
   return null; }
 function goTopic(id,from){ var cur=TABS[T].id; S._pend=[T,P]; S.hist.push(S._pend);
   if(cur==="start"&&HEALTH.indexOf(id)>=0&&id!=="vessel") S.first=id;
@@ -3414,6 +3500,8 @@ document.addEventListener("click",function(e){
     if((tid==="brain"||tid==="heart")&&["vessel","brain","heart"].indexOf(TABS[T].id)<0){ S.vesselTo=tid; go(tabIdx("vessel"),S.seen.cancer?0:1); }
     else go(ti,0); }
   else if(a==="goTopic"){ goTopic(b.dataset.v); }
+  else if(a==="bodyGo"){ go(tabIdx("body"),bodyIdx(b.dataset.v)); }
+  else if(a==="jgoB"){ S._pend=[T,P]; S.hist.push(S._pend); go(tabIdx("body"),bodyIdx(b.dataset.v)); }
   else if(a==="jgo"){ var jv=b.dataset.v; if(jv==="vessel"&&!HEALTH.some(function(h){ return S.seen[h]; })) S.first="brain"; goTopic(jv); }
   else if(a==="lsJob"){ S.ls=S.ls||{}; S.ls.job=(S.ls.job===b.dataset.v?"":b.dataset.v); render(); }
   else if(a==="lsSec"){ S.lsSec=b.dataset.v; render(); var lq=document.querySelector(".ls-q"); if(lq&&lq.scrollIntoView&&innerWidth<900) lq.scrollIntoView({block:"start",behavior:"smooth"}); }
