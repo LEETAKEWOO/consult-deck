@@ -1293,7 +1293,6 @@ button.tier{border:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .tier .tinfo i{font-style:normal;font-size:11.5px;font-weight:700;color:var(--tc,#1d4ed8);margin-right:2px}
 .tier .tinfo span{grid-column:auto;background:#fff;border-radius:8px;padding:4px 9px;font-size:12.5px;color:var(--ink,#222);font-weight:600}
 button.si{border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:inherit;text-align:left;width:100%;cursor:pointer}
-.si.siq:not(.open){outline:1.5px dashed #c5ccd5}
 .longev{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:1.5px dashed #c5ccd5;background:transparent;border-radius:14px;padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:inherit;cursor:pointer;text-align:left}
 .longev.open{border-style:solid;background:color-mix(in srgb,var(--tc,#1d4ed8) 7%,var(--card,#fff))}
 .longev i{font-style:normal;font-size:18px}
@@ -1762,6 +1761,16 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .ch .ic.blog,.ch .ic.yt{overflow:hidden;padding:0}
 .ch .ic.yt{background:#fff;border:1px solid var(--line)}
 .ch .ic img.logo{width:100%;height:100%;object-fit:cover;display:block}
+/* 병원비: 가장 무서운 질병 */
+.jdis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (max-width:700px){.jdis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.jdis .jd{display:flex;align-items:center;gap:10px;min-width:0;padding:12px 14px;border-radius:16px;background:var(--bg);color:var(--ink);border:0;font:inherit;text-align:left}
+.jdis .ji{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,var(--bg));color:var(--c)}
+.jdis .ji svg{width:19px;height:19px}
+.jdis .jd b{font-size:16px;font-weight:800;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.jdis.go .jd{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.jdis.go .jd:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.jdis .ja{font-weight:800;color:var(--c)}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -2067,11 +2076,15 @@ var JOURNEY = [
   ["전이/재발","정기검진에서 가장 걱정하며 확인하는 건 뭘까요?"]
 ];
 var JSUB = ["","실손","실손","","","후유장해","",""];
+var JDIS=[["brain","뇌 질환"],["heart","심장 질환"],["vessel","혈관 질환"],["cancer","암 질환"]];
+function jDis(click){ return '<div class="jdis'+(click?' go':'')+'">'+JDIS.map(function(d){ var t=TABS[tabIdx(d[0])];
+  return click? '<button class="jd" data-act="jgo" data-v="'+d[0]+'" id="jd-'+d[0]+'" style="--c:'+t.c+'"><span class="ji">'+ico(t.ic)+'</span><b>'+d[1]+'</b><span class="ja" aria-hidden="true">→</span></button>'
+    : '<span class="jd" style="--c:'+t.c+'"><span class="ji">'+ico(t.ic)+'</span><b>'+d[1]+'</b></span>'; }).join("")+'</div>'; }
 function pJourney(){
   var j=S.journey, L=JOURNEY.length, loop=j>=L, last=j===L-1;
   var q= loop? '진단받았을 때, 가장 무서운 질병은 뭘까요?' : last? '전이·재발이 되면, 어떤 일이 생길까요?' : JOURNEY[j+1][1];
   return '<div class="slide jslide" data-act="jtap" id="jtap">'+head("병원비","병원비가 실제로 어디 어디에 들어갈까요?")+
-  '<div class="jq'+(loop?' end':'')+'"><span class="k">'+(loop?'그럼':String(Math.min(j+2,L)).padStart(2,"0"))+'</span><p>'+q+'</p></div>'+
+  '<div class="jq'+(loop?' end':'')+'"><span class="k">'+(loop?'그럼':String(Math.min(j+2,L)).padStart(2,"0"))+'</span><p>'+q+'</p>'+(j===0||loop? jDis(loop) : '')+'</div>'+
   '<div class="route'+(loop?' loop':'')+'">'+JOURNEY.map(function(x,i){ var shown=loop||i<=j, nxt=(i===j+1)||(last&&i===L-1), again=false;
     return '<div class="step'+((i<j&&!loop)||(loop&&i!==L-1)?" past":"")+((i===j&&!last)||(loop&&i===L-1)||(last&&i===L-1)?" now":"")+(shown?"":" veiled")+(nxt?" nxt":"")+(again?" again":"")+'" id="jst-'+i+'"><span class="n">'+String(i+1).padStart(2,"0")+'</span><b>'+(x[0]==="정기검진"?'정기검진<small class="jsm">(재진단)</small>':x[0])+'</b>'+(again?'<em>다시 진단</em>':(loop&&i===L-1)?'<em>합병증까지</em>':(JSUB[i]&&JSUB[i]!=="실손"?'<em>'+JSUB[i]+'</em>':''))+(JSUB[i]==="실손"?'<span class="sil">실손</span>':'')+'</div>'; }).join("")+'</div>'+
   (loop?'<div class="jcomp"><b>전이·재발</b>이 되면, 치료가 길어지고 <b>합병증까지</b> 생길 수 있어요.</div>':'<p class="tapline">화면을 누르면 다음 칸이 열려요</p>')+
@@ -2081,7 +2094,7 @@ function nJourney(){ var j=S.journey, L=JOURNEY.length, nx=JOURNEY[Math.min(j+1,
   var A={"진단":"의사 선생님이요. 검사를 받고, 진단을 받죠. 보험도 진단비부터 준비돼 있어야 해요.","수술":"수술이요. 수술비는 수술 종류에 따라 크게 달라요.","입원":"가족이 기다리고 있겠죠. 환자는 산소호흡기를 찬 채 중환자실이나 입원실로 옮겨지고, 그동안 소득은 멈춰요.","간병":"간병인을 쓰게 돼요. 간병비는 실손으로 안 나와요.","항암치료":"항암 치료요. 몇 달씩 이어지고, 새로 나온 표적·면역항암제는 비급여인 경우도 있어요.","요양병원":"요양병원으로 옮기는 경우가 많고, 장해가 남기도 해요.","정기검진":"정기검진이요. 치료가 끝나도 몇 년 동안 꾸준히 확인해요.","전이/재발":"재발과 전이예요. 그러면 다시 진단받고 다시 치료해야 해요."};
   return N("q","(건강부터 온 경우 먼저) 요즘 건강 관련해서, 가장 걱정되시는 게 있을까요?")+N("a","있어요 / 부모님이 OO로… / 딱히 없어요")+N("tip","있다 → 그 이야기부터, 아래 병원비 흐름으로 / 딱히 없다 → ‘그럼 건강보다 은퇴 후가 더 신경 쓰이세요?’ → 그렇다면 아래 ‘은퇴 후’ 탭")+
   N("q","병원비가 실제로 어디 어디에 들어갈까요? 하나씩 같이 따라가 볼게요.")+
-  (j<L-1? N("q",nx[1])+N("a",A[nx[0]]) : j===L-1? N("q","전이·재발이 되면, 어떤 일이 생길까요?")+N("a","치료가 길어지고, 합병증까지 생길 수 있어요. 그래서 진단비가 한 번으로 끝나면 부족해요.") : N("q","진단받았을 때, 가장 무서운 질병은 뭘까요?")+N("a","암이요 / 심장이요 / 뇌요")+N("tip","고객 답을 잡고 ‘다음’을 누르면 "+TABS[tabIdx(nextHealth()==="vessel"?"vessel":(S.first||"cancer"))].name+"(으)로 가요. 어디로 갈지는 시작할 때 정한 대로예요."))+
+  (j<L-1? N("q",nx[1])+N("a",A[nx[0]]) : j===L-1? N("q","전이·재발이 되면, 어떤 일이 생길까요?")+N("a","치료가 길어지고, 합병증까지 생길 수 있어요. 그래서 진단비가 한 번으로 끝나면 부족해요.") : N("q","진단받았을 때, 가장 무서운 질병은 뭘까요?")+N("a","암이요 / 심장이요 / 뇌요")+N("tip","고객이 고른 질병(뇌·심장·혈관·암)을 누르면 그 탭으로 바로 가요. 뇌·심장은 혈관부터 이어져요. ‘다음’을 누르면 시작할 때 정한 순서대로 "+TABS[tabIdx(nextHealth()==="vessel"?"vessel":(S.first||"cancer"))].name+"(으)로 가요."))+
   N("tip","질문을 던지고 고객이 답하면 화면 아무 곳이나 눌러 다음 칸을 열어요. 전이·재발까지 연 뒤 한 번 더 누르면 아래에 ‘합병증까지 생길 수 있어요’가 뜨고, ‘가장 무서운 질병’ 질문이 나와요. 수술·입원은 실손 의료비가 일부 막아 주는 구간이에요.")+
   N("link","진단, 수술, 입원, 간병, 항암치료, 요양병원, 정기검진, 전이까지 잘 준비돼 있는지 볼게요."); }
 
@@ -2182,7 +2195,7 @@ var CANCER = [
       '<div class="grid2"><div class="card"><span class="k">STEP 1</span><span class="big num c">1,000<small>만원</small></span><h3>갑상선암 보장</h3><span class="d">유사암 진단비가 나와요</span></div>'+
       '<div class="card'+(r?" warn":"")+'"><span class="k">STEP 2</span><span class="big num'+(r?' strike':' c')+'">5,000<small>만원'+(r?'':'?')+'</small></span><h3>일반 암 보장</h3><span class="d">'+(r?'처음 생긴 갑상선암 기준이라 일반암 진단비는 안 나와요':'일반암 진단비가 나올까요?')+'</span></div></div>'+
       (r? '<div class="qz'+(pick==="no"?" ok":"")+'"><div class="out"><b>'+(pick==="no"?"맞습니다.":"안 나옵니다.")+'</b> 약관에서는 처음 암이 생긴 부위(원발암)로 분류해요.</div></div>'
-         : '<div class="qz"><p>갑상선암이 다른 곳으로 전이됐다면, 일반암 진단비가 나올까요?</p><div class="ans"><button data-act="meta" data-v="yes" id="meta-y">나온다</button><button data-act="meta" data-v="no" id="meta-n">안 나온다</button></div></div>')+
+         : '<div class="qz"><p>갑상선암이 다른 곳으로 전이됐다면,<br>일반암 진단비가 나올까요?</p><div class="ans"><button data-act="meta" data-v="yes" id="meta-y">나온다</button><button data-act="meta" data-v="no" id="meta-n">안 나온다</button></div></div>')+
     '</div><div class="card'+(r?' risecard':'')+'"><h3 class="'+(r?'rise':'')+'">한 번 암에 걸리면, 다른 암 위험도 올라가요</h3><table class="mini"><tbody>'+
       [["갑상선암","유방암 2배 · 전립선암 1.3배"],["유방암","위암 1.4배 · 대장암 1.3배 · 폐암 1.2배"],["위암","유방암 1.6배 · 대장암 1.4배 · 폐암 1.3배"],["대장암","유방암 1.6배 · 위암 1.3배"],["자궁경부암","폐암 2.2배 · 대장암 1.3배"],["전립선암","방광암 2.3배 · 대장암 1.3배 · 위암 1.2배"]].map(function(x){ return '<tr><td><b>'+x[0]+'</b></td><td class="r" style="font-weight:500">'+x[1]+'</td></tr>'; }).join("")+
     '</tbody></table><span class="src">KBS 생로병사의 비밀(국립암센터 자료 인용)</span></div></div>'+
@@ -3401,6 +3414,7 @@ document.addEventListener("click",function(e){
     if((tid==="brain"||tid==="heart")&&["vessel","brain","heart"].indexOf(TABS[T].id)<0){ S.vesselTo=tid; go(tabIdx("vessel"),S.seen.cancer?0:1); }
     else go(ti,0); }
   else if(a==="goTopic"){ goTopic(b.dataset.v); }
+  else if(a==="jgo"){ var jv=b.dataset.v; if(jv==="vessel"&&!HEALTH.some(function(h){ return S.seen[h]; })) S.first="brain"; goTopic(jv); }
   else if(a==="lsJob"){ S.ls=S.ls||{}; S.ls.job=(S.ls.job===b.dataset.v?"":b.dataset.v); render(); }
   else if(a==="lsSec"){ S.lsSec=b.dataset.v; render(); var lq=document.querySelector(".ls-q"); if(lq&&lq.scrollIntoView&&innerWidth<900) lq.scrollIntoView({block:"start",behavior:"smooth"}); }
   else if(a==="lsMul"){ S.ls=S.ls||{}; var mg=b.dataset.g, mo=S.ls[mg]||{}, mv=b.dataset.v; if(mv==="none") mo={none:!mo.none}; else { mo[mv]=!mo[mv]; delete mo.none; } S.ls[mg]=mo; if(mg==="fam"){ S.q=S.q||{}; S.q.fam={can:!!mo.can,brain:!!mo.brain,heart:!!mo.heart,none:!!mo.none}; } render(); }
