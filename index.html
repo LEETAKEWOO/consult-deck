@@ -1829,6 +1829,28 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .bd-ok{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:16px 20px;border-radius:18px;background:var(--navy);color:#fff}
 .bd-ok span{font-size:14px;font-weight:800;color:#FFB46E}
 .bd-ok b{font-size:clamp(17px,1.9vw,21px);font-weight:800;letter-spacing:-.03em}
+/* 자주 아픈 곳: 상황 카드 */
+.bd-sc{display:grid;gap:12px;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+.bd-sc.n2{--n:2}.bd-sc.n3{--n:3}
+@media (max-width:820px){.bd-sc{grid-template-columns:minmax(0,1fr)}}
+.bdc{display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:22px;border-radius:22px;border:0;background:var(--card);font:inherit;color:inherit;text-align:left;cursor:pointer}
+.bdc-k{font-size:13px;font-weight:700;color:var(--muted)}
+.bdc-t{font-size:clamp(21px,2.3vw,27px);font-weight:800;letter-spacing:-.035em;line-height:1.3;color:var(--ink);margin-bottom:4px}
+.bdc-r{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--bg);position:relative}
+.bdc-r i{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:17px;color:#fff}
+.bdc-r > span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bdc-r em{font-style:normal;font-weight:800;font-size:16px;letter-spacing:-.02em}
+.bdc-r small{font-size:13px;color:var(--muted);font-weight:600}
+.bdc-r.no i{background:var(--warn)}.bdc-r.no small{color:var(--warn)}
+.bdc-r.low i{background:#E8892B}.bdc-r.low small{color:#B5651D}
+.bdc-r.ok i{background:var(--ok)}
+.bdc-r.fix{background:color-mix(in srgb,var(--c) 12%,var(--bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--c) 45%,transparent)}
+.bdc-r.fix i{background:var(--c)}
+.bdc-r.fix em{font-size:18px}
+.bdc-r.fix small{color:var(--c)}
+.bdc-r .fs{margin-left:auto}
+.bdc-tap{text-align:center;font-size:14px;font-weight:700;color:var(--c);padding:12px;border-radius:14px;background:color-mix(in srgb,var(--c) 10%,var(--bg))}
+.bd-foot{margin:0;font-size:14px;font-weight:600;color:var(--muted);text-align:center}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3335,17 +3357,25 @@ var FI={
 Object.keys(FI).forEach(function(k){ IC["b_"+k]=FI[k]; });
 var BODY=[
  {id:"spine", nm:"허리·목", c:"#6D52C7", ev:"디스크·협착증", q:"허리 디스크,<br>지금 보험으로 다 받을 수 있을까요?",
-  usual:["상해 수술비","실손"], plus:[["su2","질병 수술비","디스크는 질병이에요"],["di1","질병후유장해","신경 손상이 남으면"]], ok:"다쳐서든 닳아서든 · 수술해도, 장해가 남아도"},
+  sc:[["디스크로 수술","상해 수술비","no","디스크는 질병이라 못 받아요","su2","질병 수술비"],
+      ["신경 손상이 남음","수술비","no","수술비는 수술할 때만 나와요","di1","질병후유장해"]]},
  {id:"knee", nm:"무릎·어깨", c:"#0E8F8F", ev:"연골·인대·인공관절", q:"무릎·어깨,<br>지금 보험으로 다 받을 수 있을까요?",
-  usual:["상해 수술비","골절진단비"], plus:[["su2","질병 종수술비","닳아서 생긴 연골·힘줄 · 인공관절"],["di2","상해후유장해","3%부터"]], ok:"운동하다 다쳐도, 나이 들어 닳아도"},
+  sc:[["닳아서 연골·힘줄 수술","상해 수술비","no","닳아서 생긴 건 질병이에요","su2","질병 수술비"],
+      ["인공관절 수술","정액 수술비","low","큰 수술도 같은 금액이에요","su2","1~5종 수술비"],
+      ["다쳐서 장해가 남음","고도후유장해 (80% 이상)","no","가벼운 장해는 못 받아요","di2","상해후유장해 3%부터"]]},
  {id:"eye", nm:"눈", c:"#2F6FD0", ev:"백내장 · 수술 1위", q:"우리나라에서 가장 많이 받는 수술,<br>뭘까요?", ans:"백내장",
-  usual:["질병 수술비","실손"], plus:[["di1","질병후유장해","시력이 떨어지는 병 · 당뇨 합병증 등"]], ok:"수술로 끝나도, 시력이 떨어져도"},
+  sc:[["백내장 수술","질병 수술비","ok","대부분 받아요","su2","질병 수술비"],
+      ["시력이 떨어짐 (당뇨 합병증 등)","수술비","no","수술이 없으면 못 받아요","di1","질병후유장해"]]},
  {id:"gut", nm:"장", c:"#2C7A4F", ev:"치질·용종·담낭", q:"내시경에서 용종을 떼면,<br>보험금이 나올까요?",
-  usual:["실손"], plus:[["su2","질병 수술비","용종 제거도 수술 · 치질·담낭도"]], ok:"검진 때 용종을 떼도, 치질·담낭 수술도"},
+  sc:[["검진 때 용종 제거","실손","low","쓴 병원비만 돌려받아요","su2","질병 수술비"],
+      ["치질·담낭 수술","실손","low","쓴 병원비만 돌려받아요","su2","질병 수술비"]]},
  {id:"bone", nm:"뼈", c:"#0B4C8C", ev:"골절", q:"뼈가 부러지면,<br>지금 보험으로 다 받을 수 있을까요?",
-  usual:["골절진단비"], plus:[["su3","상해 수술비","핀 고정 수술"],["di2","상해후유장해","3%부터 · 잘못 붙으면"]], ok:"깁스로 끝나도, 수술해도, 장해가 남아도"},
- {id:"tooth", nm:"치아", c:"#C95F0A", ev:"충치·크라운·임플란트", q:"임플란트,<br>지금 보험으로 받을 수 있을까요?",
-  usual:["실손"], plus:[["x_th","치아 담보","크라운·임플란트는 비급여"]], ok:"충치부터 임플란트까지 · 면책 90~180일, 감액 1~2년 확인"}
+  sc:[["이가 부러짐","골절진단비 (치아파절 제외)","no","치아는 빠져 있어요","ba3","치아파절 포함"],
+      ["핀 고정 수술","골절진단비","low","진단비만 나와요","su3","상해 수술비"],
+      ["잘못 붙어 장해가 남음","고도후유장해 (80% 이상)","no","가벼운 장해는 못 받아요","di2","상해후유장해 3%부터"]]},
+ {id:"tooth", nm:"치아", c:"#C95F0A", ev:"충치·크라운·임플란트", q:"임플란트,<br>지금 보험으로 받을 수 있을까요?", foot:"치아 담보는 가입 후 90~180일 보장이 안 되고, 1~2년은 절반만 나올 수 있어요",
+  sc:[["크라운 씌우기","실손","no","비급여라 거의 못 받아요","x_th","치아 담보 (보존)"],
+      ["임플란트","실손","no","비급여라 거의 못 받아요","x_th","치아 담보 (보철)"]]}
 ];
 function bodyIdx(id){ for(var i=0;i<BODY.length;i++) if(BODY[i].id===id) return i; return 0; }
 function bodySt(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k){ return opn[k]; }), g=CK_G[id], st=ckState(id);
@@ -3355,23 +3385,22 @@ function bodySt(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k
   if(used&&g&&!opn[g]) return ["n","없음"];
   return null; }
 var BODY_PAGES=BODY.map(function(b,bi){ return {title:b.nm, html:function(){
-  var rk="bd_"+b.id, ansOpen=!b.ans||!!S.rev[rk], plusOpen=!!S.rev[rk+"_p"];
+  var rk="bd_"+b.id, ansOpen=!b.ans||!!S.rev[rk];
   var sw='<div class="bd-sw">'+BODY.map(function(x,xi){ return '<button class="bd-t'+(xi===bi?' on':'')+'" data-act="bodyGo" data-v="'+x.id+'" id="bd-'+x.id+'" style="--c:'+x.c+'" aria-pressed="'+(xi===bi)+'"><span class="ic">'+ico("b_"+x.id)+'</span><b>'+x.nm+'</b></button>'; }).join("")+'</div>';
-  var ans= b.ans? '<button class="card bd-ans'+(S.rev[rk]?' open':'')+'" data-act="rev" data-k="'+rk+'" id="rev-'+rk+'"><span class="k">정답</span><b>'+(S.rev[rk]?b.ans:'?')+'</b>'+(S.rev[rk]?'<span class="d">그럼 지금 보험으로 다 받을 수 있을까요?</span>':'<span class="tap">눌러서 보기</span>')+'</button>' : '';
-  var usual='<div class="bd-us"><span class="k">보통 이렇게 들어가 있어요</span><div class="bd-uc">'+b.usual.map(function(u){ return '<span>'+u+'</span>'; }).join("")+'</div></div>';
-  var plus= plusOpen?
-     '<div class="bd-pl"><span class="k">이것까지 있어야 제대로 받아요</span><div class="bd-cv n'+b.plus.length+'">'+b.plus.map(function(c){ var st=bodySt(c[0]);
-       return '<div class="bd-c" style="--c:'+b.c+'"><span class="bd-n">＋</span><b>'+c[1]+'</b><em>'+c[2]+'</em>'+(st?'<span class="fs '+st[0]+'">'+st[1]+'</span>':'')+'</div>'; }).join("")+'</div></div>'+
-     '<div class="bd-ok"><span>그래야</span><b>'+b.ok+'</b></div>'
-   : '<button class="bd-q" data-act="rev" data-k="'+rk+'_p" id="rev-'+rk+'_p"><b>이것만으로 충분할까요?</b><span class="tap">눌러서 보기</span></button>';
-  return '<div class="slide bd-page" style="--tc:'+b.c+'">'+head(b.nm+" · "+b.ev, b.q)+sw+ans+
-    (ansOpen? '<div class="bd-flow">'+usual+'<span class="bd-ar" aria-hidden="true">→</span>'+plus.replace(/^/, '<div class="bd-right">')+'</div></div>' : '')+'</div>'; },
-  notes:function(){ var p=b.plus.map(function(c){ return c[1]+"("+c[2]+")"; }).join(", ");
-    return N("say","암, 뇌, 심장이 멀게 느껴지셔도, 이런 데는 누구나 한 번쯤 병원에 가요.")+
+  var ans= b.ans? '<button class="card bd-ans'+(S.rev[rk]?' open':'')+'" data-act="rev" data-k="'+rk+'" id="rev-'+rk+'"><span class="k">정답</span><b>'+(S.rev[rk]?b.ans:'?')+'</b>'+(S.rev[rk]?'':'<span class="tap">눌러서 보기</span>')+'</button>' : '';
+  var MK={no:["✕","못 받아요"],low:["△","부족해요"],ok:["✓","받아요"]};
+  var cards='<div class="bd-sc n'+b.sc.length+'">'+b.sc.map(function(c,ci){ var k=rk+"_"+ci, op=!!S.rev[k], st=bodySt(c[4]), m=MK[c[2]];
+    return '<button class="bdc'+(op?' open':'')+'" data-act="rev" data-k="'+k+'" id="rev-'+k+'" style="--c:'+b.c+'">'+
+      '<span class="bdc-k">이런 일이 생기면</span><b class="bdc-t">'+c[0]+'</b>'+
+      '<span class="bdc-r '+c[2]+'"><i>'+m[0]+'</i><span><em>'+c[1]+'</em><small>'+c[3]+'</small></span></span>'+
+      (op? '<span class="bdc-r fix"><i>✓</i><span><em>'+c[5]+'</em><small>있어야 받아요</small></span>'+(st?'<span class="fs '+st[0]+'">'+st[1]+'</span>':'')+'</span>'
+         : (c[2]==="ok"? '' : '<span class="bdc-tap">그럼 뭐가 있어야 할까요? 눌러서 보기</span>'))+'</button>'; }).join("")+'</div>';
+  return '<div class="slide bd-page" style="--tc:'+b.c+'">'+head(b.nm+" · "+b.ev, b.q)+sw+ans+(ansOpen? cards+(b.foot?'<p class="bd-foot">'+b.foot+'</p>':''):'')+'</div>'; },
+  notes:function(){ return N("say","암, 뇌, 심장이 멀게 느껴지셔도, 이런 데는 누구나 한 번쯤 병원에 가요.")+
     N("q",b.q.replace(/<br>/g," "))+(b.ans?N("a",b.ans):"")+
-    N("say","보통은 "+b.usual.join("·")+" 정도 들어가 있어요. 그런데 "+p+"까지 있어야 제대로 받아요.")+N("say","그래야 "+b.ok.replace(/ · /g,", ")+" 받을 수 있어요.")+
+    b.sc.map(function(c){ return c[2]==="ok"? N("say",c[0]+"은 "+c[1]+"로 대부분 받아요.") : N("q",c[0]+", "+c[1]+"로 받을 수 있을까요?")+N("a",c[3]+" → "+c[5]+"이(가) 있어야 받아요."); }).join("")+
     N("q","지금 보험에 이게 들어 있는지, 같이 확인해 볼까요?")+
-    N("tip","위쪽 버튼으로 다른 부위로 바로 넘어갈 수 있어요. 보장분석 탭에서 체크하면 ‘이것까지’ 카드에 되어 있음 / 빈칸이 같이 떠요."); }}; });
+    N("tip","카드를 누르면 ‘이게 있어야 받아요’가 열려요. 위쪽 버튼으로 다른 부위로 바로 넘어갈 수 있어요. 보장분석 탭에서 체크하면 카드에 되어 있음 / 빈칸이 같이 떠요."); }}; });
 var TABS = [
   {id:"start", name:"시작", ic:"start", c:"var(--t-start)", pages:[{title:"나는 잘 준비하고 있을까",html:pCover,notes:nCover},{title:"보험을 준비하는 순서",html:pJourney,notes:nJourney}]},
   {id:"cancer", name:"암", ic:"cancer", c:"var(--t-cancer)", pages:CANCER},
