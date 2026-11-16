@@ -1810,6 +1810,25 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .bd-pt{border:0;font:inherit;cursor:pointer;text-align:center;padding:18px 20px;border-radius:18px;background:var(--navy);color:#fff}
 .bd-pt b{font-size:clamp(18px,2vw,22px);font-weight:800;letter-spacing:-.03em}
 .bd-pt .tap{color:#FFB46E}
+/* 자주 아픈 곳: 보통 → 이것까지 */
+.bd-flow{display:grid;grid-template-columns:minmax(0,.8fr) auto minmax(0,1.6fr);gap:14px;align-items:stretch}
+@media (max-width:820px){.bd-flow{grid-template-columns:minmax(0,1fr)}.bd-ar{transform:rotate(90deg);justify-self:center}}
+.bd-us{display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:20px;background:var(--card)}
+.bd-us .k,.bd-pl .k{font-size:13.5px;font-weight:800;color:var(--muted)}
+.bd-pl .k{color:var(--tc)}
+.bd-uc{display:flex;flex-direction:column;gap:8px}
+.bd-uc span{padding:14px 16px;border-radius:14px;background:var(--bg);font-size:clamp(17px,1.9vw,21px);font-weight:800;letter-spacing:-.03em;color:var(--ink2)}
+.bd-ar{align-self:center;font-size:30px;font-weight:800;color:var(--tc)}
+.bd-right{display:flex;flex-direction:column;gap:12px}
+.bd-pl{display:flex;flex-direction:column;gap:12px}
+.bd-c .bd-n{font-family:var(--f);font-size:20px;font-weight:800;color:var(--c);line-height:1}
+.bd-c{min-height:0}
+.bd-q{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;border:2px dashed color-mix(in srgb,var(--tc) 45%,transparent);border-radius:20px;background:color-mix(in srgb,var(--tc) 6%,var(--card));font:inherit;color:var(--ink);cursor:pointer}
+.bd-q b{font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.035em}
+.bd-q .tap{color:var(--tc)}
+.bd-ok{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:16px 20px;border-radius:18px;background:var(--navy);color:#fff}
+.bd-ok span{font-size:14px;font-weight:800;color:#FFB46E}
+.bd-ok b{font-size:clamp(17px,1.9vw,21px);font-weight:800;letter-spacing:-.03em}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3315,18 +3334,18 @@ var FI={
 };
 Object.keys(FI).forEach(function(k){ IC["b_"+k]=FI[k]; });
 var BODY=[
- {id:"spine", nm:"허리·목", c:"#6D52C7", ev:"디스크·협착증", q:"허리 디스크로 수술하면,<br>어디서 보장받을까요?", pt:"디스크는 질병이에요 · 상해 수술비로는 안 나와요",
-  cv:[["su2","질병 수술비","척추 수술"],["ba1","실손","주사·시술·도수"]]},
- {id:"knee", nm:"무릎·어깨", c:"#0E8F8F", ev:"연골·인대·인공관절", q:"무릎·어깨가 아프면,<br>어떤 보장이 필요할까요?", pt:"닳으면 질병, 다치면 상해 · 둘 다 있어야 해요",
-  cv:[["su2","질병 수술비","연골·인공관절"],["su3","상해 수술비","인대·골절"],["di2","상해후유장해","3%부터"]]},
- {id:"eye", nm:"눈", c:"#2F6FD0", ev:"백내장 · 수술 1위", q:"우리나라에서 가장 많이 받는 수술,<br>뭘까요?", ans:"백내장", pt:"2025년 69만 건 · 수술 1위예요",
-  cv:[["su2","질병 수술비","백내장"],["ba1","실손","검사·치료"]]},
- {id:"gut", nm:"장", c:"#2C7A4F", ev:"치질·용종·담낭", q:"내시경에서 용종을 떼면,<br>보험금이 나올까요?", pt:"용종 제거도 수술이에요 · 치질·담낭도 수술 순위 상위",
-  cv:[["su2","질병 수술비","용종·치질·담낭"],["ba1","실손","내시경·검사"]]},
- {id:"bone", nm:"뼈", c:"#0B4C8C", ev:"골절", q:"뼈가 부러지면,<br>어떤 보장이 필요할까요?", pt:"깁스만 하면 수술비는 안 나와요",
-  cv:[["ba3","골절진단비","치아파절 포함"],["su3","상해 수술비","핀 고정"]]},
- {id:"tooth", nm:"치아", c:"#C95F0A", ev:"충치·크라운·임플란트", q:"임플란트,<br>건강보험으로 보장될까요?", pt:"건강보험엔 치아가 없어요 · 따로 있어야 해요",
-  cv:[["x_th","치아 담보","보존·보철"]]}
+ {id:"spine", nm:"허리·목", c:"#6D52C7", ev:"디스크·협착증", q:"허리 디스크,<br>지금 보험으로 다 받을 수 있을까요?",
+  usual:["상해 수술비","실손"], plus:[["su2","질병 수술비","디스크는 질병이에요"],["di1","질병후유장해","신경 손상이 남으면"]], ok:"다쳐서든 닳아서든 · 수술해도, 장해가 남아도"},
+ {id:"knee", nm:"무릎·어깨", c:"#0E8F8F", ev:"연골·인대·인공관절", q:"무릎·어깨,<br>지금 보험으로 다 받을 수 있을까요?",
+  usual:["상해 수술비","골절진단비"], plus:[["su2","질병 종수술비","닳아서 생긴 연골·힘줄 · 인공관절"],["di2","상해후유장해","3%부터"]], ok:"운동하다 다쳐도, 나이 들어 닳아도"},
+ {id:"eye", nm:"눈", c:"#2F6FD0", ev:"백내장 · 수술 1위", q:"우리나라에서 가장 많이 받는 수술,<br>뭘까요?", ans:"백내장",
+  usual:["질병 수술비","실손"], plus:[["di1","질병후유장해","시력이 떨어지는 병 · 당뇨 합병증 등"]], ok:"수술로 끝나도, 시력이 떨어져도"},
+ {id:"gut", nm:"장", c:"#2C7A4F", ev:"치질·용종·담낭", q:"내시경에서 용종을 떼면,<br>보험금이 나올까요?",
+  usual:["실손"], plus:[["su2","질병 수술비","용종 제거도 수술 · 치질·담낭도"]], ok:"검진 때 용종을 떼도, 치질·담낭 수술도"},
+ {id:"bone", nm:"뼈", c:"#0B4C8C", ev:"골절", q:"뼈가 부러지면,<br>지금 보험으로 다 받을 수 있을까요?",
+  usual:["골절진단비"], plus:[["su3","상해 수술비","핀 고정 수술"],["di2","상해후유장해","3%부터 · 잘못 붙으면"]], ok:"깁스로 끝나도, 수술해도, 장해가 남아도"},
+ {id:"tooth", nm:"치아", c:"#C95F0A", ev:"충치·크라운·임플란트", q:"임플란트,<br>지금 보험으로 받을 수 있을까요?",
+  usual:["실손"], plus:[["x_th","치아 담보","크라운·임플란트는 비급여"]], ok:"충치부터 임플란트까지 · 면책 90~180일, 감액 1~2년 확인"}
 ];
 function bodyIdx(id){ for(var i=0;i<BODY.length;i++) if(BODY[i].id===id) return i; return 0; }
 function bodySt(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k){ return opn[k]; }), g=CK_G[id], st=ckState(id);
@@ -3336,18 +3355,23 @@ function bodySt(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k
   if(used&&g&&!opn[g]) return ["n","없음"];
   return null; }
 var BODY_PAGES=BODY.map(function(b,bi){ return {title:b.nm, html:function(){
-  var rk="bd_"+b.id, open=!!S.rev[rk];
+  var rk="bd_"+b.id, ansOpen=!b.ans||!!S.rev[rk], plusOpen=!!S.rev[rk+"_p"];
   var sw='<div class="bd-sw">'+BODY.map(function(x,xi){ return '<button class="bd-t'+(xi===bi?' on':'')+'" data-act="bodyGo" data-v="'+x.id+'" id="bd-'+x.id+'" style="--c:'+x.c+'" aria-pressed="'+(xi===bi)+'"><span class="ic">'+ico("b_"+x.id)+'</span><b>'+x.nm+'</b></button>'; }).join("")+'</div>';
-  var cards='<div class="bd-cv n'+b.cv.length+'">'+b.cv.map(function(c,ci){ var s=bodySt(c[0]);
-    return '<div class="bd-c" style="--c:'+b.c+'"><span class="bd-n num">'+String(ci+1).padStart(2,"0")+'</span><b>'+c[1]+'</b><em>'+c[2]+'</em>'+(s?'<span class="fs '+s[0]+'">'+s[1]+'</span>':'')+'</div>'; }).join("")+'</div>';
-  return '<div class="slide bd-page" style="--tc:'+b.c+'">'+head(b.nm+" · "+b.ev, b.q)+sw+
-    (b.ans? '<button class="card bd-ans'+(open?' open':'')+'" data-act="rev" data-k="'+rk+'" id="rev-'+rk+'"><span class="k">정답</span><b>'+(open?b.ans:'?')+'</b>'+(open?'':'<span class="tap">눌러서 보기</span>')+'</button>' : '')+
-    (b.ans&&!open? '' : '<div class="bd-k"><span>꼭 있어야 할 담보</span></div>'+cards)+
-    (b.ans&&!open? '' : '<button class="bd-pt" data-act="rev" data-k="'+rk+'_p" id="rev-'+rk+'_p">'+(S.rev[rk+"_p"]? '<b>'+b.pt+'</b>' : '<span class="tap">이게 빠지면? 눌러서 보기</span>')+'</button>')+
-    '</div>'; },
-  notes:function(){ return N("q","관심 있는 곳이 있으세요? 허리, 무릎, 눈, 장, 뼈, 치아 중에서요.")+N("say","암, 뇌, 심장이 멀게 느껴지셔도, 이런 데는 누구나 한 번쯤 병원에 가요. 여기서 꼭 있어야 할 담보가 빠져 있으면 제대로 못 받아요.")+
-    N("q",b.q.replace(/<br>/g," "))+(b.ans?N("a",b.ans):"")+N("say",b.pt)+
-    N("tip","위쪽 버튼으로 다른 부위로 바로 넘어갈 수 있어요. 보장분석 탭에서 체크하면 담보 카드에 ‘되어 있음 / 빈칸’이 같이 떠요."); }}; });
+  var ans= b.ans? '<button class="card bd-ans'+(S.rev[rk]?' open':'')+'" data-act="rev" data-k="'+rk+'" id="rev-'+rk+'"><span class="k">정답</span><b>'+(S.rev[rk]?b.ans:'?')+'</b>'+(S.rev[rk]?'<span class="d">그럼 지금 보험으로 다 받을 수 있을까요?</span>':'<span class="tap">눌러서 보기</span>')+'</button>' : '';
+  var usual='<div class="bd-us"><span class="k">보통 이렇게 들어가 있어요</span><div class="bd-uc">'+b.usual.map(function(u){ return '<span>'+u+'</span>'; }).join("")+'</div></div>';
+  var plus= plusOpen?
+     '<div class="bd-pl"><span class="k">이것까지 있어야 제대로 받아요</span><div class="bd-cv n'+b.plus.length+'">'+b.plus.map(function(c){ var st=bodySt(c[0]);
+       return '<div class="bd-c" style="--c:'+b.c+'"><span class="bd-n">＋</span><b>'+c[1]+'</b><em>'+c[2]+'</em>'+(st?'<span class="fs '+st[0]+'">'+st[1]+'</span>':'')+'</div>'; }).join("")+'</div></div>'+
+     '<div class="bd-ok"><span>그래야</span><b>'+b.ok+'</b></div>'
+   : '<button class="bd-q" data-act="rev" data-k="'+rk+'_p" id="rev-'+rk+'_p"><b>이것만으로 충분할까요?</b><span class="tap">눌러서 보기</span></button>';
+  return '<div class="slide bd-page" style="--tc:'+b.c+'">'+head(b.nm+" · "+b.ev, b.q)+sw+ans+
+    (ansOpen? '<div class="bd-flow">'+usual+'<span class="bd-ar" aria-hidden="true">→</span>'+plus.replace(/^/, '<div class="bd-right">')+'</div></div>' : '')+'</div>'; },
+  notes:function(){ var p=b.plus.map(function(c){ return c[1]+"("+c[2]+")"; }).join(", ");
+    return N("say","암, 뇌, 심장이 멀게 느껴지셔도, 이런 데는 누구나 한 번쯤 병원에 가요.")+
+    N("q",b.q.replace(/<br>/g," "))+(b.ans?N("a",b.ans):"")+
+    N("say","보통은 "+b.usual.join("·")+" 정도 들어가 있어요. 그런데 "+p+"까지 있어야 제대로 받아요.")+N("say","그래야 "+b.ok.replace(/ · /g,", ")+" 받을 수 있어요.")+
+    N("q","지금 보험에 이게 들어 있는지, 같이 확인해 볼까요?")+
+    N("tip","위쪽 버튼으로 다른 부위로 바로 넘어갈 수 있어요. 보장분석 탭에서 체크하면 ‘이것까지’ 카드에 되어 있음 / 빈칸이 같이 떠요."); }}; });
 var TABS = [
   {id:"start", name:"시작", ic:"start", c:"var(--t-start)", pages:[{title:"나는 잘 준비하고 있을까",html:pCover,notes:nCover},{title:"보험을 준비하는 순서",html:pJourney,notes:nJourney}]},
   {id:"cancer", name:"암", ic:"cancer", c:"var(--t-cancer)", pages:CANCER},
