@@ -1816,7 +1816,7 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 var DEF = {
   name:"이택우", role:"미래에셋 설계사",
   blogName:"아프기 전에, 택코치", blogUrl:"https://blog.naver.com/silver_rec",
-  ytName:"택코치", ytUrl:"", photo:"",
+  ytName:"택코치", ytUrl:"https://www.youtube.com/@takcoach_kr", photo:"",
   nonCov:3000, monthly:300, months:24, careDay:14, careDays:30, careMonths:12, nursing:300, nursingMonths:12, follow:300,
   retire:60, lifeM:83.7, lifeF:88.4, healthyAge:65.5, coupleCost:298.1, singleCost:197.6, infl:2.1, saveRate:3.21,
   t_c1:6622, t_c2:2000, t_c3:3000, t_c4:3000, t_c5:300, t_c6:10,
@@ -1825,6 +1825,8 @@ var DEF = {
 };
 var cfg = Object.assign({}, DEF);
 try{ var sv = JSON.parse(localStorage.getItem("tc-deck-cfg")||"null"); if(sv) Object.assign(cfg, sv); }catch(e){}
+if(!cfg.ytUrl) cfg.ytUrl=DEF.ytUrl;
+function fixUrl(u){ u=(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u.replace(/^\/+/,""); return u; }
 function saveCfg(){ cfgStamp(); storeLocal(); syncSoon(); }
 
 /* ================= 상담 상태(저장 안 함) ================= */
@@ -2009,9 +2011,9 @@ function avatar(){ return cfg.photo? '<img class="av" src="'+cfg.photo+'" alt="'
 var TYPES=[["건강","아플 때","암·뇌·심장·수술"],["연금","은퇴 후","매달 생활비"],["부재","내가 부재할 때","가족 부담 · 증여세"]];
 function pCover(){
   var open=S.rev.cover, m=S.rev.max, parts=maxParts(), tot=parts.reduce(function(a,p){return a+p[1];},0);
-  var yt = cfg.ytUrl ? '<a class="ch" href="'+esc(cfg.ytUrl)+'" target="_blank" rel="noopener"><span class="ic yt">'+LOGO_YT+'</span><span class="t"><span>건강 유튜브</span><b>'+esc(cfg.ytName)+'</b><em>1분이면 보는 건강 상식</em></span><span class="go">영상 보기 ↗</span></a>'
+  var yt = cfg.ytUrl ? '<a class="ch" href="'+esc(fixUrl(cfg.ytUrl))+'" target="_blank" rel="noopener"><span class="ic yt">'+LOGO_YT+'</span><span class="t"><span>건강 유튜브</span><b>'+esc(cfg.ytName)+'</b><em>1분이면 보는 건강 상식</em></span><span class="go">영상 보기 ↗</span></a>'
     : '<button class="ch setlink" data-act="openSetYt" id="yt-set"><span class="ic yt">'+LOGO_YT+'</span><span class="t"><span>건강 유튜브</span><b>'+esc(cfg.ytName)+'</b><em>1분이면 보는 건강 상식</em></span><span class="go">눌러서 채널 주소 넣기 →</span></button>';
-  var blog = '<a class="ch" href="'+esc(cfg.blogUrl||"#")+'" target="_blank" rel="noopener"><span class="ic blog">'+LOGO_NV+'</span><span class="t"><span>건강 블로그</span><b>'+esc(cfg.blogName)+'</b><em>몸이 보내는 신호를 글로 정리해 둬요</em></span><span class="go">글 보기 ↗</span></a>';
+  var blog = '<a class="ch" href="'+esc(fixUrl(cfg.blogUrl)||"#")+'" target="_blank" rel="noopener"><span class="ic blog">'+LOGO_NV+'</span><span class="t"><span>건강 블로그</span><b>'+esc(cfg.blogName)+'</b><em>몸이 보내는 신호를 글로 정리해 둬요</em></span><span class="go">글 보기 ↗</span></a>';
   return '<div class="slide">'+
   '<div class="hero-h"><div class="eyebrow">보장 분석</div><h1>보험, 어떻게<br>준비하는 게 <span style="white-space:nowrap">가장 좋을까요?</span></h1></div>'+
   '<div class="veil'+(open?' open':'')+'">'+
@@ -3440,9 +3442,9 @@ document.addEventListener("click",function(e){
     else S.q[qk]=(S.q[qk]===b.dataset.v?"":b.dataset.v);
     applyQ(qk); var sc=$("qsheet").querySelector(".sheet-body").scrollTop; buildQ(); $("qsheet").querySelector(".sheet-body").scrollTop=sc; render(); }
   else if(a==="pickType"){ var pv=b.dataset.v;
-    if(pv==="health"){ S.rev.pickH=!S.rev.pickH; render(); var cp=$("cpick"); if(cp&&cp.scrollIntoView) cp.scrollIntoView({block:"nearest",behavior:"smooth"}); }
+    if(pv==="health"){ S.mode="health"; S.lifeFrom=""; S.path=""; S.retFrom=null; S.rev.pickH=!S.rev.pickH; render(); var cp=$("cpick"); if(cp&&cp.scrollIntoView) cp.scrollIntoView({block:"nearest",behavior:"smooth"}); }
     else if(pv==="pension"){ S.mode="retire"; S.lifeFrom=""; S.path="pen"; S._pend=[T,P]; S.hist.push(S._pend); S.retFrom=[0,0]; go(tabIdx("retire"),retirePages().indexOf(RET_LAND)); }
-    else { S.lifeFrom="absent"; goTopic("life"); } }
+    else { S.mode="life"; S.lifeFrom="absent"; S.retFrom=null; goTopic("life"); } }
   else if(a==="mode"){ S.mode=b.dataset.v; S.lifeFrom=""; S.path=""; var fst=b.dataset.first; if(fst) S.first=fst; $("launch").hidden=true; S.rev={}; S.journey=-1; go(0,0); render();
     if(fst){ S.rev.cover=true; goTopic(fst); } }
   else if(a==="openSetYt"){ buildSheet(); $("sheet").hidden=false; var yf=$("cfg-ytUrl"); if(yf){ yf.scrollIntoView({block:"center"}); try{ yf.focus({preventScroll:true}); }catch(e){} } }
