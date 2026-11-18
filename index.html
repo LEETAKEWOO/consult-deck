@@ -2031,6 +2031,24 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .pc-sc small{font-size:12px;color:var(--navy-text)}
 .pc-bridge{display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:20px;background:var(--navy);color:#fff}
 .pc-bridge b{font-size:clamp(18px,2vw,22px);font-weight:800}.pc-bridge span{color:rgba(255,255,255,.82);font-size:15px}
+/* 부족한 곳: 무엇이 없는지 · 부족한지 */
+.pc-gaps{display:block;columns:2;column-gap:12px}
+@media (max-width:820px){.pc-gaps{columns:1}}
+.pc-gap{break-inside:avoid;margin-bottom:12px;padding:8px 8px 14px;display:flex;flex-direction:column;gap:10px}
+.pc-gh{cursor:default;padding:12px 12px 4px}
+.pc-gs{display:flex;flex-direction:column;gap:8px;padding:0 12px}
+.pc-gs .lb{font-size:12.5px;font-weight:800;letter-spacing:.02em}
+.pc-gs.no .lb{color:var(--warn)}.pc-gs.low .lb{color:#B5651D}.pc-gs.sim .lb{color:var(--navy-text)}.pc-gs.ok .lb{color:var(--ok)}
+.pc-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pc-chips span{font-size:13.5px;font-weight:700;line-height:1.35;padding:6px 11px;border-radius:10px;background:var(--bg)}
+.pc-gs.no .pc-chips span{background:var(--warn-soft);color:var(--ink)}
+.pc-gs.sim .pc-chips span{background:var(--navy-soft)}
+.pc-gs.ok .pc-chips span{font-weight:600;color:var(--muted)}
+.pc-gs ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pc-gs li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:9px 12px;border-radius:10px;background:rgba(232,137,43,.12)}
+.pc-gs li b{font-size:13.5px;font-weight:700;line-height:1.35}
+.pc-gs li span{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}.pc-gs li i{font-style:normal;opacity:.4;margin:0 2px}
+.pc-gap,.pc-gh{box-sizing:border-box}.pc-gap{width:100%}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3669,7 +3687,7 @@ function planHTML(){
   var status= busy? '<p class="pc-busy">PDF를 읽는 중이에요…</p>' : err? '<p class="pc-err">'+esc(err)+'</p>' : '';
   var cmp='';
   if(sel&&(pol.length||S.planEdit)){ var edit=!!S.planEdit, inc=0, cnt=0, groups={}, order=[];
-    sel.rows.forEach(function(r,i){ var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타";
+    sel.rows.forEach(function(r,i){ if(!edit&&!r[6]) return; var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타";
       if(!groups[g]){ groups[g]=[]; order.push(g); } groups[g].push({r:r,i:i,j:j,on:on}); if(on){ inc+=r[4]||0; cnt++; } });
     var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
     var full=sel.rows.reduce(function(s,r){ return s+(r[6]?(r[4]||0):0); },0), mx=num(S.maxPrem), cp=num(S.curPrem)||0, room=mx? Math.max(0,mx-cp)*10000 : 0;
@@ -3696,7 +3714,7 @@ function pcStepNav(st){ var L=[["1","부족한 곳"],["2","이대로 가면"],["
   return '<div class="pc-steps">'+L.map(function(x){ var n=+x[0]; return '<button class="pc-st'+(st===n?' on':'')+(st>n?' done':'')+'" data-act="pcStep" data-v="'+n+'" aria-pressed="'+(st===n)+'"><i>'+(st>n?'✓':n)+'</i><b>'+x[1]+'</b></button>'; }).join('<span class="pc-stl" aria-hidden="true"></span>')+'</div>'; }
 function rowRatio(r,j){ if(j.k==="ok") return 1; if(j.k==="low") return Math.min(1,j.cur/(r[3]||1)); if(j.k==="no") return 0; return null; }
 function gapData(sel){ var G={}, order=[], tot=0, n=0;
-  sel.rows.forEach(function(r){ if(!r[6]) return; var j=judge(r), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "그 외", q=rowRatio(r,j);
+  sel.rows.forEach(function(r){ if(!r[6]) return; var j=judge(r), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "그 외", q=rowRatio(r,j); if(/^ca/.test(r[5]||"")) g="암";
     if(!G[g]){ G[g]={rows:[],sum:0,n:0,no:0,low:0,ok:0,sim:0}; order.push(g); }
     var o=G[g]; o.rows.push({r:r,j:j,q:q}); if(q!==null){ o.sum+=q; o.n++; tot+=q; n++; } o[j.k==="e"?"no":j.k]++; });
   var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
@@ -3704,13 +3722,17 @@ function gapData(sel){ var G={}, order=[], tot=0, n=0;
 function gapHTML(sel){ var d=gapData(sel), op=S.gapOpen||{};
   var crit='<div class="pc-crit"><b>판단 기준</b><span>풀담보 설계의 담보와 금액이 100%예요.</span><span><i class="ok"></i>충분 · 같은 담보가 그 금액 이상</span><span><i class="low"></i>부족 · 있지만 금액이 적음</span><span><i class="no"></i>없음 · 아예 없음</span><span><i class="sim"></i>다른 이름으로 있음 · 약관 확인</span></div>';
   var hero='<div class="pc-ghero"><div class="ring-w">'+ckRing(d.pct/100, d.pct+'<small>%</small>', '준비됨')+'</div><div><span class="k">풀담보와 비교하면</span><b>지금 보험은 '+d.pct+'% 준비돼 있어요</b><span class="d">빈 곳 '+d.order.reduce(function(s,g){ return s+d.G[g].no; },0)+'개 · 부족한 곳 '+d.order.reduce(function(s,g){ return s+d.G[g].low; },0)+'개</span></div></div>';
-  var cards='<div class="pc-gaps">'+d.order.map(function(g){ var o=d.G[g], p=o.n? Math.round(o.sum/o.n*100) : null, lv= p===null?"sim": p>=100?"ok": p===0?"no":"low", open=!!op[g];
-    return '<div class="pc-gap '+lv+(open?' open':'')+'"><button class="pc-gh" data-act="gapOpen" data-v="'+esc(g)+'" aria-expanded="'+open+'"><b>'+esc(g)+'</b><span class="pc-bar"><i style="width:'+(p||0)+'%"></i></span><em>'+(p===null?'확인':p===0?'없음':p>=100?'충분':p+'%')+'</em></button>'+
-      '<div class="pc-gc">'+(o.no?'<span class="no">없음 '+o.no+'</span>':'')+(o.low?'<span class="low">부족 '+o.low+'</span>':'')+(o.sim?'<span class="sim">다른 이름 '+o.sim+'</span>':'')+(o.ok?'<span class="ok">충분 '+o.ok+'</span>':'')+'</div>'+
-      (open? '<ul class="pc-gl">'+o.rows.map(function(x){ var w=x.q===null?0:Math.round(x.q*100);
-        return '<li><span class="nm">'+esc(shortNm(x.r[0]))+'</span><span class="pc-bar sm"><i style="width:'+w+'%"></i></span><span class="am num">'+(x.j.cur?wonTxt(x.j.cur):x.j.k==="sim"?'다른 이름':'0원')+' / '+wonTxt(x.r[3])+'</span></li>'; }).join("")+'</ul>' : '')+'</div>'; }).join("")+'</div>';
+  var cards='<div class="pc-gaps">'+d.order.map(function(g){ var o=d.G[g], p=o.n? Math.round(o.sum/o.n*100) : null, lv= p===null?"sim": p>=100?"ok": p===0?"no":"low";
+    var by=function(k){ return o.rows.filter(function(x){ return x.j.k===k; }); };
+    var no=kwMerge(by("no").map(function(x){ return kwNm(x.r[0]); })), low=by("low"), sim=by("sim"), ok=by("ok");
+    var sec='';
+    if(no.length) sec+='<div class="pc-gs no"><span class="lb">없음</span><div class="pc-chips">'+no.map(function(t){ return '<span>'+esc(t)+'</span>'; }).join("")+'</div></div>';
+    if(low.length) sec+='<div class="pc-gs low"><span class="lb">부족</span><ul>'+low.map(function(x){ return '<li><b>'+esc(kwNm(x.r[0]))+'</b><span class="num">지금 '+wonTxt(x.j.cur)+' <i>/</i> 풀담보 '+wonTxt(x.r[3])+'</span></li>'; }).join("")+'</ul></div>';
+    if(sim.length) sec+='<div class="pc-gs sim"><span class="lb">다른 이름</span><div class="pc-chips">'+sim.map(function(x){ return '<span>'+esc(kwNm(x.r[0]))+'</span>'; }).join("")+'</div></div>';
+    if(ok.length) sec+='<div class="pc-gs ok"><span class="lb">충분</span><div class="pc-chips">'+ok.map(function(x){ return '<span>'+esc(kwNm(x.r[0]))+'</span>'; }).join("")+'</div></div>';
+    return '<div class="pc-gap '+lv+'"><div class="pc-gh"><b>'+esc(g)+'</b><span class="pc-bar"><i style="width:'+(p||0)+'%"></i></span><em>'+(p===null?'확인':p===0?'없음':p>=100?'충분':p+'%')+'</em></div>'+sec+'</div>'; }).join("")+'</div>';
   return '<div class="pc-step-b">'+hero+crit+cards+'<button class="pc-next" data-act="pcStep" data-v="2">이대로 가면 어떻게 될까요? →</button></div>'; }
-var SCEN=[["암 진단을 받으면",["ca1"],"진단비"],["뇌혈관 질환(뇌경색 포함) 진단을 받으면",["br1","br2"],"진단비"],["심장 질환(협심증·부정맥 등) 진단을 받으면",["he1","he2","he3","he6"],"진단비"],
+var SCEN=[["암 진단을 받으면",["ca1","ca3"],"진단비"],["1년 뒤 또 암 진단을 받으면",["ca3"],"진단비"],["뇌혈관 질환(뇌경색 포함) 진단을 받으면",["br1","br2"],"진단비"],["심장 질환(협심증·부정맥 등) 진단을 받으면",["he1","he2","he3","he6"],"진단비"],
   ["암 수술·항암 치료를 받으면",["ca6","ca6s","ca7"],"치료비"],["혈관이 막혀 뚫는 치료를 받으면",["he5"],"치료비"],["큰 수술(5종)을 받으면",["su2"],"수술비",/5종/],["간병인을 쓰면 (하루)",["di3"],"하루"]];
 function scenHTML(sel){ var cards=[];
   SCEN.forEach(function(s){ var plan=0, cur=0, sim=false;
@@ -3722,6 +3744,24 @@ function scenHTML(sel){ var cards=[];
     return '<div class="pc-sc"><b class="t">'+c.t+'</b><div class="pc-sv"><div><span>지금 받는 돈</span><b class="num'+(c.cur?'':' z')+'">'+(c.cur?wonTxt(c.cur):'0원')+'</b></div><div><span>풀담보면</span><b class="num">'+wonTxt(c.plan)+'</b></div></div>'+
       '<span class="pc-bar lg"><i style="width:'+w+'%"></i></span><p class="q">모자란 <b class="num">'+wonTxt(c.gap)+'</b>, 그때 어디서 마련하실 건가요?</p>'+(c.sim?'<small>다른 이름의 비슷한 담보가 있어 약관 확인이 필요해요</small>':'')+'</div>'; }).join("")+'</div>'+
     '<div class="pc-bridge"><b>그래서 풀담보로 다 채우면 가장 든든해요</b><span>다만 매달 내는 돈이 부담될 수 있으니, 풀담보를 기준으로 하나씩 같이 조율해 봐요</span></div><button class="pc-next" data-act="pcStep" data-v="3">같이 조율하기 →</button></div>'; }
+function kwNm(n){ n=(n||"").replace(/^\[갱신형\]/,"").replace(/\((건강|추가|간편|일반)고지형\)/g,"").replace(/\(갱신형_\d+년\)/g,"").replace(/\(감액없음\)|\(수술당\)/g,"")
+    .replace(/,?\s*(치료별\s*)?연간\d+회한/g,"").replace(/\(\s*\)/g,"").replace(/([비료])[ⅠⅡⅢⅣⅤ]/g,"$1").replace(/\((\d)회지급형\)/," $1회 지급형").trim();
+  var m;
+  if(/^보험료\s*납입면제/.test(n)) return "보험료 납입면제";
+  if(/리셋월렛/.test(n)) return "리셋월렛 (3대질병 고액치료·간병)";
+  if((m=n.match(/^통합심장\((.+)\)진단비$/))){ var x=m[1].replace(/^특정심혈관질환\((.+)\)$/,"$1"); return x+" 진단비"; }
+  if((m=n.match(/^순환계질환[^_]*_(.+)$/))) return "순환계 "+m[1];
+  if((m=n.match(/^암주요치료비[^_]*_(.+)$/))) return m[1];
+  if(/^암주요치료비\(유사암\)/.test(n)) return "유사암 주요치료비";
+  if((m=n.match(/^(질병|상해)1~5종수술비\((\d)종\)$/))) return m[1]+" 1~5종 수술비 "+m[2]+"종";
+  return n.replace(/(\S)\(/g,"$1 (").replace(/\)\(/g,") (");
+}
+/* 1~5종처럼 같은 이름이 종만 다르면 하나로 묶어요 */
+function kwMerge(L){ var out=[], idx={};
+  L.forEach(function(nm){ var m=nm.match(/^(.+수술비) (\d)종$/);
+    if(m){ if(idx[m[1]]===undefined){ idx[m[1]]=out.length; out.push({b:m[1],k:[m[2]]}); } else out[idx[m[1]]].k.push(m[2]); }
+    else out.push({b:nm}); });
+  return out.map(function(o){ return o.k? o.b+" "+o.k.join("·")+"종" : o.b; }); }
 var PLAN_PAGE={title:"설계 비교", html:planHTML,
   notes:function(){ return N("say","지금 가지고 계신 보험이랑, 제가 준비한 안을 나란히 놓고 볼게요.")+N("q","이미 충분한 건 빼고, 비어 있는 곳만 채우면 한 달에 이 정도예요. 어떠세요?")+
     N("tip","‘충분’은 같은 이름의 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. ‘비슷한 담보’는 이름은 다르지만 같은 종류라, 약관 범위를 보고 직접 판단해요.")+
