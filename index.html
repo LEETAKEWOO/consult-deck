@@ -2049,6 +2049,7 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .pc-gs li b{font-size:13.5px;font-weight:700;line-height:1.35}
 .pc-gs li span{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}.pc-gs li i{font-style:normal;opacity:.4;margin:0 2px}
 .pc-gap,.pc-gh{box-sizing:border-box}.pc-gap{width:100%}
+.pc-sil{margin-top:4px}.pc-sil .sil{margin:0}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3216,7 +3217,7 @@ var RISK_PAGE={title:"일과 생활습관", html:function(){ var L=S.ls||{}, sec
   function disCard(d,big){ return '<div class="ln'+(big?' must':'')+'"><div class="ln-h"><b>'+d.nm+'</b>'+(d.tr.length>1?'<span class="ln-n">이유 '+d.tr.length+'</span>':'')+'</div>'+
     '<div class="ln-tr">'+d.tr.map(function(x){ return '<span>'+x+'</span>'; }).join("")+'</div>'+
     '<span class="ln-ev">'+d.ev+(d.src?' <em>'+d.src+'</em>':'')+'</span>'+
-    '<div class="ln-cov"><i>챙길 담보</i>'+d.cov.map(function(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k){ return opn[k]; }), inT=!!CK_G[id]&&(!used||opn[CK_G[id]]), st=ckState(id); return '<b class="cs-'+(inT?(st||"e"):"x")+'" title="'+esc(inT?COV[id].tip:"보장분석표에 없는 담보 · 새로 넣을지 검토")+'"><span class="csm">'+(!inT?"＋":st==="y"?"✓":st==="n"?"✕":st==="u"?"?":"·")+'</span>'+COV[id].nm+'</b>'; }).join("")+'</div></div>'; }
+    '<div class="ln-cov"><i>챙길 담보</i>'+d.cov.map(function(id){ var opn=S.ckOpen||{}, used=Object.keys(opn).some(function(k){ return opn[k]; }), inT=!!CK_G[id]&&(!used||opn[CK_G[id]]), st=ckState(id); return '<b class="cs-'+(inT?(st||"e"):"x")+'" title="'+esc(inT?COV[id].tip:"증권 비교 항목에 없는 담보 · 새로 넣을지 검토")+'"><span class="csm">'+(!inT?"＋":st==="y"?"✓":st==="n"?"✕":st==="u"?"?":"·")+'</span>'+COV[id].nm+'</b>'; }).join("")+'</div></div>'; }
   return '<div class="slide">'+head("생활습관 검사","내 일과 생활습관, 어떤 병이 더 생길 수 있을까요?","암·뇌·심장은 기본으로 챙겼다고 보고, 그 밖의 병과 챙길 담보를 봐요. 숫자는 근거가 확인된 것만 넣었어요.")+
   '<div class="ls-steps">'+LSEC.map(function(s2,i){ return '<button class="lst'+(s2.id===sec?' on':'')+'" data-act="lsSec" data-v="'+s2.id+'" id="lsec-'+s2.id+'"><i>'+(i+1)+'</i>'+s2.nm+'</button>'; }).join("")+'</div>'+
   '<div class="ls-wrap"><div class="ls-q card">'+body+
@@ -3230,9 +3231,9 @@ var RISK_PAGE={title:"일과 생활습관", html:function(){ var L=S.ls||{}, sec
    N("tip","직업을 고르면 그 직업에 맞는 질문이 이어서 나와요. 사무·IT: 앉아 있는 시간·통증 / 현장: 높은 곳·기계·무거운 것·분진 / 운전: 차 종류·운전 시간 / 서비스: 서 있는 시간 / 교대: 밤 근무 횟수·연차 / 자영업: 일하는 날.")+
    N("q","담배나 술은 어느 정도 하세요? 건강검진에서 혈압이나 간 수치 얘기 들으신 적 있으세요?")+
    N("say","암·뇌·심장은 기본으로 챙기셨다고 보고요. 말씀하신 습관을 보면, 그 밖에 이런 병이 생길 가능성이 더 있어요. 꼭 걸린다는 뜻은 아니지만, 그만큼 이 담보를 실제로 쓰게 될 가능성이 큰 거죠.")+
-   N("q","앞에서 증권으로 확인해 보니, 이 담보들은 어떻게 돼 있었죠? (담보 옆 ✓·✕·? 표시가 보장분석 확인표 결과예요)")+
+   N("q","앞에서 증권으로 확인해 보니, 이 담보들은 어떻게 돼 있었죠? (증권을 올렸으면 담보 옆에 ✓·✕·?가 떠요)")+
    N("tip","캐묻는 느낌이 들지 않게, 고객이 편하게 말한 만큼만 눌러요. 흡연·음주·직업·검진 결과는 가입할 때 알릴 의무(고지)가 있는 항목이라, 설계 때도 사실대로 적어야 한다고 같이 안내해요. 현장직·운전직·이륜차는 직업·위험 등급 때문에 상해 담보 금액이 제한될 수 있어요.")+
-   N("tip","병은 이유가 많이 겹친 순서로 나와요. 2개 이상 겹친 병의 담보는 보장분석 확인표에도 ‘꼭 챙길 담보’로 표시돼요. 담보 옆 ✓·✕·?는 보장분석 확인표에서 체크한 결과예요. 하지정맥류·손목·대상포진·교통사고는 근거 수치를 확인하지 못해 설명만 넣었어요.")+
+   N("tip","병은 이유가 많이 겹친 순서로 나와요. 담보 옆 ✓·✕·?는 설계 비교에 올린 증권 결과예요(✓ 충분 · ? 부족·다른 이름 · ✕ 없음). 하지정맥류·손목·대상포진·교통사고는 근거 수치를 확인하지 못해 설명만 넣었어요.")+
    N("link","빈칸(✕)인 담보를 중심으로, 추가로 넣을 부분을 같이 정리해 볼게요."); }};
 
 /* ================= 보장분석 확인표 (체크식) ================= */
@@ -3520,7 +3521,7 @@ var TOTAL = [
     function seg(n,cls){ return n&&sumAll? '<i class="'+cls+'" style="flex:'+n+'"></i>' : ''; }
     function col(t,cls,mark,items,f){ return '<section class="cl-sec '+cls+'"><header><span class="clm">'+mark+'</span><b>'+t+'</b><span class="cn num">'+items.length+'</span></header>'+(items.length?'<ul>'+items.map(f).join("")+'</ul>':'<p class="cl-none">없어요</p>')+'</section>'; }
     return '<div class="slide cl-page">'+head("종합","지금 보험, 빈 곳이 얼마나 있었을까요?")+
-    '<div class="cl-hero"><div class="ch-l"><span class="ch-k">채워야 할 곳</span><b class="num">'+total+'<small>곳</small></b><span class="ch-d">'+(held?'확인한 담보 '+held+'개 중 잘 되어 있는 곳 '+ok+'개':'보장분석 탭에서 체크하면 여기에 모여요')+'</span></div>'+
+    '<div class="cl-hero"><div class="ch-l"><span class="ch-k">채워야 할 곳</span><b class="num">'+total+'<small>곳</small></b><span class="ch-d">'+(held?'확인한 담보 '+held+'개 중 잘 되어 있는 곳 '+ok+'개':'설계 비교에서 증권을 올리면 여기에 모여요')+'</span></div>'+
       '<div class="ch-r"><div class="ch-bar">'+seg(blank.length,"n")+seg(narrow.length,"c")+seg(plus.length,"p")+seg(ok,"y")+(sumAll?'':'<i class="e" style="flex:1"></i>')+'</div>'+
       '<div class="ch-lg"><span><i class="n"></i>빈칸 <b class="num">'+blank.length+'</b></span><span><i class="c"></i>보장 안 되는 경우 <b class="num">'+narrow.length+'</b></span><span><i class="p"></i>더 챙길 담보 <b class="num">'+plus.length+'</b></span><span><i class="y"></i>잘 되어 있음 <b class="num">'+ok+'</b></span></div></div></div>'+
     (total? '<div class="cl-grid">'+
@@ -3528,7 +3529,7 @@ var TOTAL = [
       col("보장 안 되는 경우","c","!",narrow,function(x){ return '<li><b>'+x.nm+'</b><span>'+x.why+'</span></li>'; })+
       col("더 챙길 담보","p","＋",plus,function(x){ return '<li><b>'+x+'</b><span>생활습관 검사 · 지금 보험에 없는 담보</span></li>'; })+
     '</div><div class="cl-msg"><span class="cl-ic">✓</span><div><b>이 '+total+'곳, 빈틈없이 채워서 여러 보험사 상품으로 비교해 올게요</b><span>잘 되어 있는 '+ok+'곳은 그대로 두고, 필요한 곳만 보완해요.</span></div></div>'
-    : '<div class="ls-empty card"><b>아직 정리할 내용이 없어요</b><span class="d">보장분석 탭에서 가입한 보험을 펼쳐 체크하고, 생활습관 검사를 하면 여기에 모여요.</span></div>')+
+    : '<div class="ls-empty card"><b>아직 정리할 내용이 없어요</b><span class="d">설계 비교에서 고객 증권을 올리고, 생활습관 검사를 하면 여기에 모여요.</span></div>')+
     '<div class="cl-wrap">'+    '<div class="cl-box"><h3>보험료, 한 달에 얼마까지 괜찮으세요?</h3>'+
       '<div class="cl-f"><label for="t-max">최대 보험료</label><div class="amt"><input id="t-max" data-s="maxPrem" inputmode="numeric" placeholder="0" value="'+esc(S.maxPrem)+'"><span>만원</span></div></div>'+
       '<div class="cl-f"><label for="t-cp">지금 내는 보험료</label><div class="amt"><input id="t-cp" data-s="curPrem" inputmode="numeric" placeholder="0" value="'+esc(S.curPrem)+'"><span>만원</span></div></div>'+
@@ -3539,7 +3540,7 @@ var TOTAL = [
     N("say","잘 되어 있는 곳은 그대로 두고요. 제가 이 부분까지 빈틈없이 보완해서, 여러 보험사 상품으로 비교해서 가져올게요.")+
     N("q","한 달 보험료는 어느 정도까지 괜찮으세요? (말씀하신 금액을 ‘최대 보험료’ 칸에)")+
     N("q","비교안 준비해서 언제 다시 뵐까요? (아래 ‘다음 만남’에서 날짜·시간 고르고 등록)")+
-    N("tip","숫자는 보장분석 탭 체크와 생활습관 검사 결과가 자동으로 모인 거예요. 일정은 이 아이패드에만 저장되고, 다른 고객 이름은 가운데를 가려서(김○○) 보여요. 실제로 못 받는 날은 ‘이 날 마감’으로 막아 두세요."); }},
+    N("tip","숫자는 설계 비교에 올린 증권과 생활습관 검사 결과가 자동으로 모인 거예요. 일정은 이 아이패드에만 저장되고, 다른 고객 이름은 가운데를 가려서(김○○) 보여요. 실제로 못 받는 날은 ‘이 날 마감’으로 막아 두세요."); }},
   {title:"마무리", html:function(){
     var R=[["암","간암 평균 치료비 · 가장 큰 금액 기준","6,622만원","cancer","var(--t-cancer)"],["뇌혈관","뇌혈관질환 평균 치료비","5,132만원","brain","var(--t-brain)"],["심장","허혈성 심장질환 평균 치료비","4,800만원","heart","var(--t-heart)"],["수술","암·뇌·심장 수술 1회","500~1,000만원","surgery","var(--t-surgery)"],["후유장해","장해가 남았을 때 · 질병후유장해 기준 가입금액","5,000만원","disab","var(--t-disab)"]];
     return '<div class="slide">'+head("마무리","아플 때 드는 비용, 한눈에 볼게요")+
@@ -3673,18 +3674,25 @@ function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
   if(st==="y") return {k:"sim",t:"보장분석: 있음",cur:0};
   if(st==="n") return {k:"no",t:"보장분석: 빈칸",cur:0};
   return {k:"e",t:"",cur:0}; }
+/* 올린 증권 결과를 담보 체크 상태로 옮겨요 · 생활습관·종합 탭이 이걸 씀 */
+function ckFromPol(sel){ var ck=Object.assign({},S.ck), opn=Object.assign({},S.ckOpen), rank={n:0,u:1,y:2}, got={};
+  sel.rows.forEach(function(r){ if(!r[6]||!r[5]||!CK_G[r[5]]) return; var k=judge(r).k, v= k==="ok"?"y" : k==="no"?"n" : "u";
+    if(got[r[5]]===undefined||rank[v]>rank[got[r[5]]]) got[r[5]]=v; });
+  polRows().forEach(function(x){ if(x.id&&CK_G[x.id]&&!got[x.id]) got[x.id]="y"; });
+  Object.keys(got).forEach(function(id){ ck[id]=got[id]; opn[CK_G[id]]=true; });
+  S.ck=ck; S.ckOpen=opn; }
 function planOn(p,i,j){ var o=(S.planOn||{})[p.id+"_"+i]; if(o!==undefined) return o; if(!p.rows[i][6]) return false; return j.k!=="ok"; }
 function planHTML(){
   var plans=planList(), sel=planById(S.planSel)||autoPlan(), pol=S.pol||[], busy=S.pdfBusy, err=S.pdfErr;
   var polCard='<div class="pc-card pc-main"><div class="pc-h"><span class="pc-ic">'+ico("total")+'</span><div><b>고객이 가진 보험</b><span>증권 PDF를 올리면 풀담보와 바로 비교돼요</span></div></div>'+
     (pol.length? '<ul class="pc-pol">'+pol.map(function(p,i){ return '<li><div><b>'+esc(p.ins||"보험사 확인 필요")+'</b><span>'+esc(shortNm(p.prod)||"상품명 확인 필요")+'</span></div><em class="num">'+(p.total?p.total.toLocaleString("ko-KR")+'원':'')+'</em><small>담보 '+p.rows.length+'개</small><button class="pc-x" data-act="polDel" data-v="'+i+'" aria-label="지우기">×</button></li>'; }).join("")+'</ul>' : '')+
     '<label class="pc-drop'+(pol.length?' sm':'')+'" id="pc-drop"><input type="file" accept="application/pdf" multiple data-pdf="pol"><span class="pc-di">'+ico("plus")+'</span><b>'+(pol.length?'증권 더 올리기':'증권 PDF 올리기')+'</b>'+(pol.length?'':'<span>눌러서 고르거나, 파일을 여기로 끌어다 놓아요 · 방금 받은 증권은 ‘최근 항목’ 맨 위에 있어요</span>')+'</label>'+
-    (pol.length? '<button class="pc-apply" data-act="polApply">보장분석 탭에도 반영</button>' : '')+
     '<p class="pc-safe">아이패드 안에서만 읽고, 어디에도 저장하지 않아요 · 앱을 닫으면 지워져요</p></div>';
   var mgr='<div class="pc-mgr"><button class="pc-mgr-h" data-act="planMgr" aria-expanded="'+!!S.planMgr+'"><b>풀담보 설계 관리</b><span>'+plans.length+'개 · '+plans.map(function(p){ return (p.age?p.age+'세 ':'')+(p.sex||''); }).join(", ")+'</span><i aria-hidden="true">'+(S.planMgr?'−':'＋')+'</i></button>'+
     (S.planMgr? '<div class="pc-mgr-b">'+(plans.length? '<div class="pc-plans">'+plans.map(function(p){ var on=sel&&p.id===sel.id; return '<button class="pc-pl'+(on?' on':'')+'" data-act="planSel" data-v="'+p.id+'" aria-pressed="'+on+'"><b>'+esc(p.ins||"보험사")+'</b><span>'+esc(shortNm(p.prod).slice(0,24))+'</span><em>'+(p.age?'기준 '+p.age+'세 '+(p.sex||""):'')+'</em></button>'; }).join("")+'</div>' : '')+
       '<div class="pc-mgr-a"><label class="pc-up"><input type="file" accept="application/pdf" data-pdf="plan"><span>'+ico("plus")+'풀담보 설계서 올리기</span></label>'+(sel?'<button class="ghost" data-act="planEdit" aria-pressed="'+!!S.planEdit+'">'+(S.planEdit?'다 고쳤어요':'선택한 풀담보 담보 고치기')+'</button>':'')+'</div></div>' : '')+'</div>';
   var status= busy? '<p class="pc-busy">PDF를 읽는 중이에요…</p>' : err? '<p class="pc-err">'+esc(err)+'</p>' : '';
+  if(pol.length&&sel) ckFromPol(sel);
   var cmp='';
   if(sel&&(pol.length||S.planEdit)){ var edit=!!S.planEdit, inc=0, cnt=0, groups={}, order=[];
     sel.rows.forEach(function(r,i){ if(!edit&&!r[6]) return; var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타";
@@ -3708,7 +3716,8 @@ function planHTML(){
       '<p class="src">보험료는 풀담보 설계서 기준'+(sel.age?' ('+sel.age+'세 '+(sel.sex||"")+')':'')+'의 대략적인 금액이에요 · 고객 나이·직업(상해급수)에 따라 달라지니, 정해지면 다시 설계해요. 담보 이름이 같은 것끼리 금액을 비교하고, 이름이 달라도 같은 종류면 ‘비슷한 담보’로 보여 줘요.</p></div>';
   } else if(!plans.length) cmp='<div class="ls-empty card"><b>풀담보 설계가 아직 없어요</b><span class="d">아래 ‘풀담보 설계 관리’에서 한 번만 올려 두면 계속 써요.</span></div>';
   if(sel&&pol.length&&!S.planEdit){ var st=S.pcStep||1; cmp=pcStepNav(st)+(st===1?gapHTML(sel):st===2?scenHTML(sel):cmp); }
-  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+polCard+status+cmp+mgr+'</div>'; }
+  var sil='<div class="pc-sil">'+silHTML(false)+'</div>';
+  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+polCard+status+cmp+sil+mgr+'</div>'; }
 /* ---- 설계 비교 3단계: ① 부족한 곳 ② 이대로 가면 ③ 조율하기 ---- */
 function pcStepNav(st){ var L=[["1","부족한 곳"],["2","이대로 가면"],["3","같이 조율하기"]];
   return '<div class="pc-steps">'+L.map(function(x){ var n=+x[0]; return '<button class="pc-st'+(st===n?' on':'')+(st>n?' done':'')+'" data-act="pcStep" data-v="'+n+'" aria-pressed="'+(st===n)+'"><i>'+(st>n?'✓':n)+'</i><b>'+x[1]+'</b></button>'; }).join('<span class="pc-stl" aria-hidden="true"></span>')+'</div>'; }
@@ -3763,9 +3772,13 @@ function kwMerge(L){ var out=[], idx={};
     else out.push({b:nm}); });
   return out.map(function(o){ return o.k? o.b+" "+o.k.join("·")+"종" : o.b; }); }
 var PLAN_PAGE={title:"설계 비교", html:planHTML,
-  notes:function(){ return N("say","지금 가지고 계신 보험이랑, 제가 준비한 안을 나란히 놓고 볼게요.")+N("q","이미 충분한 건 빼고, 비어 있는 곳만 채우면 한 달에 이 정도예요. 어떠세요?")+
+  notes:function(){ return N("say","지금 가지고 계신 보험이랑, 잘 보장된 보험(풀담보)을 나란히 놓고 볼게요.")+
+    N("q","① 풀담보를 100%로 보면, 지금 보험은 몇 % 준비돼 있을까요?")+
+    N("q","② 이대로 가다 암 진단을 받으면, 모자란 돈은 어디서 마련하실 건가요?")+
+    N("say","③ 풀담보로 다 채우면 가장 든든하지만, 매달 부담될 수 있어요. 풀담보를 기준으로 하나씩 같이 빼 볼게요.")+
     N("tip","‘충분’은 같은 이름의 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. ‘비슷한 담보’는 이름은 다르지만 같은 종류라, 약관 범위를 보고 직접 판단해요.")+
-    N("tip","고객 증권은 저장하지 않아요. 풀담보 설계는 폰·아이패드에 같이 저장돼서 계속 남아 있어요(고객 이름·설계번호는 저장 안 함)."); }};
+    N("tip","고객 증권은 저장하지 않아요. 풀담보 설계는 폰·아이패드에 같이 저장돼서 계속 남아 있어요(고객 이름·설계번호는 저장 안 함).")+
+    N("tip","실손은 증권의 가입일(계약일)을 ‘실손 가입일’ 칸에 넣으면 세대와 지금 불리한 점이 나와요. 넣으면 실손 ‘되어 있음’과 세대 기준(1·2세대면 보장)이 자동으로 체크돼요. 2009년 8~9월 가입은 보험사마다 표준화 시점이 달라 증권의 자기부담률로 세대를 확인해요.")+N("tip","1세대·초기 2세대(2013년까지)는 5세대로 바꾸면 3년간 보험료 50% 할인이 있어요(2026년 5월~). 다만 1세대는 자기부담이 거의 없어서 병원을 자주 가는 분은 유지가 나을 수 있어요. 바꿀지는 고객이 직접 따져 보게 하고, 좋은 점도 같이 말해 주기."); }};
 function pdfUpload(kind, files){ if(!files||!files.length) return; S.pdfBusy=true; S.pdfErr=""; render();
   var list=Array.prototype.slice.call(files), P=Promise.resolve(), got=[];
   list.forEach(function(f){ P=P.then(function(){ return readPdfFile(f).then(function(r){ got.push(r); }); }); });
@@ -3789,7 +3802,6 @@ var TABS = [
   {id:"disab", name:"후유장해", ic:"disab", c:"var(--t-disab)", pages:DISAB},
   {id:"retire", name:"은퇴 후", ic:"pension", c:"var(--t-pension)", get pages(){ return retirePages(); }},
   {id:"risk", name:"생활습관", ic:"vessel", c:"var(--t-vessel)", pages:[RISK_PAGE]},
-  {id:"anal", name:"보장분석", ic:"total", c:"var(--t-total)", pages:[ANAL_PAGE]},
   {id:"plan", name:"설계 비교", ic:"compare", c:"#0E8F8F", pages:[PLAN_PAGE]},
   {id:"total", name:"종합", ic:"total", c:"var(--t-total)", pages:TOTAL},
   {id:"cc", name:"고객센터", ic:"phone", c:"#0B4C8C", pages:[CC_PAGE]}
@@ -3869,7 +3881,7 @@ function goTopic(id,from){ var cur=TABS[T].id; S._pend=[T,P]; S.hist.push(S._pen
   if(id==="journey"){ go(tabIdx("start"),1); return; }
   if(id==="map"){ go(tabIdx("retire"),retirePages().indexOf(LIFE_MAP)); return; }
   if(id==="pen"||id==="life"){ S.path=id; var rp=retirePages(), f=id==="life"?lifePages()[0]:RET_LAND, ix=rp.indexOf(f); go(tabIdx("retire"),ix<0?0:ix); return; }
-  if(id==="total"){ go(tabIdx("anal"),0); return; }
+  if(id==="total"){ go(tabIdx("plan"),0); return; }
   if(id==="vessel") S.via=""; else if(cur!=="vessel") S.via="";
   /* 뇌·심장부터 시작하면 혈관은 ‘암세포는 ??을 타고’ 장을 건너뛰고 ‘뇌와 심장, 어떻게 준비하고 계세요?’부터 */
   if(id==="vessel"&&(S.first==="brain"||S.first==="heart"||S.vesselTo)&&!S.seen.cancer){ go(tabIdx("vessel"),1); return; }
