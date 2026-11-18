@@ -1964,6 +1964,22 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .pc-auto{font-size:13px;color:var(--muted);font-weight:600}
 .pc-auto .lnk{border:0;background:none;color:var(--tc);font-weight:800;cursor:pointer;padding:0;text-decoration:underline}
 .pc-ch b small{font-size:13px;font-weight:700;color:var(--muted);margin-left:6px}
+.pc-main .pc-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--tc) 14%,var(--bg));color:var(--tc)}
+.pc-main .pc-ic svg{width:22px;height:22px}
+.pc-drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:180px;padding:22px;border-radius:18px;background:var(--bg);border:2px solid color-mix(in srgb,var(--tc) 30%,var(--line));text-align:center;cursor:pointer;transition:background .15s,border-color .15s}
+.pc-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.pc-drop.over{background:color-mix(in srgb,var(--tc) 10%,var(--bg));border-color:var(--tc)}
+.pc-drop .pc-di{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--tc);color:#fff}
+.pc-drop .pc-di svg{width:26px;height:26px}
+.pc-drop b{font-size:19px;font-weight:800;color:var(--tc)}
+.pc-drop > span:not(.pc-di){font-size:13px;color:var(--muted);max-width:44ch;line-height:1.5}
+.pc-drop.sm{min-height:0;flex-direction:row;padding:14px}
+.pc-drop.sm .pc-di{width:32px;height:32px}.pc-drop.sm .pc-di svg{width:18px;height:18px}.pc-drop.sm b{font-size:15px}
+.pc-mgr{border-radius:18px;background:var(--card);overflow:hidden}
+.pc-mgr-h{width:100%;display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:16px 20px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.pc-mgr-h b{font-size:15px;font-weight:800}.pc-mgr-h span{flex:1;font-size:13px;color:var(--muted)}.pc-mgr-h i{font-style:normal;font-size:20px;font-weight:700;color:var(--muted)}
+.pc-mgr-b{display:flex;flex-direction:column;gap:10px;padding:0 20px 18px}
+.pc-mgr-a{display:flex;gap:10px;flex-wrap:wrap}.pc-mgr-a .pc-up{flex:1 1 240px}.pc-mgr-a .ghost{background:var(--bg)}.pc-mgr-a .ghost[aria-pressed="true"]{background:var(--tc);color:#fff}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3575,7 +3591,7 @@ var COV_NM={}; CKG.forEach(function(g){ g.r.forEach(function(r){ COV_NM[r[0]]={n
 function shortNm(n){ return (n||"").replace(/\((건강고지형|추가고지형|간편고지형|일반고지형)\)/g,"").replace(/\(갱신형_\d+년\)/g,"").replace(/^\[갱신형\]/,"[갱신] "); }
 function autoPlan(){ var L=planList(), a=+S.cAge||0; if(!L.length) return null; if(!a) return L[0];
   return L.slice().sort(function(p,q){ var dp=Math.abs((+p.age||0)-a)+(S.cSex&&p.sex!==S.cSex?.5:0), dq=Math.abs((+q.age||0)-a)+(S.cSex&&q.sex!==S.cSex?.5:0); return dp-dq; })[0]; }
-function planList(){ return Array.isArray(cfg.plans)? cfg.plans : []; }
+function planList(){ var L=Array.isArray(cfg.plans)? cfg.plans : []; if(!L.length&&!CFG_T.plans&&window.BUILTIN_PLANS) return window.BUILTIN_PLANS; return L; }
 function planById(id){ return planList().filter(function(p){ return p.id===id; })[0]; }
 function polRows(){ var out=[]; (S.pol||[]).forEach(function(p){ p.rows.forEach(function(r){ out.push(r); }); }); return out; }
 function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
@@ -3591,17 +3607,17 @@ function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
 function planOn(p,i,j){ var o=(S.planOn||{})[p.id+"_"+i]; if(o!==undefined) return o; if(!p.rows[i][6]) return false; return j.k!=="ok"; }
 function planHTML(){
   var plans=planList(), sel=planById(S.planSel)||autoPlan(), pol=S.pol||[], busy=S.pdfBusy, err=S.pdfErr;
-  var polCard='<div class="pc-card"><div class="pc-h"><span class="pc-n">1</span><div><b>고객이 가진 보험</b><span>증권 PDF를 올리면 담보를 읽어 와요</span></div></div>'+
+  var polCard='<div class="pc-card pc-main"><div class="pc-h"><span class="pc-ic">'+ico("total")+'</span><div><b>고객이 가진 보험</b><span>증권 PDF를 올리면 풀담보와 바로 비교돼요</span></div></div>'+
     (pol.length? '<ul class="pc-pol">'+pol.map(function(p,i){ return '<li><div><b>'+esc(p.ins||"보험사 확인 필요")+'</b><span>'+esc(shortNm(p.prod)||"상품명 확인 필요")+'</span></div><em class="num">'+(p.total?p.total.toLocaleString("ko-KR")+'원':'')+'</em><small>담보 '+p.rows.length+'개</small><button class="pc-x" data-act="polDel" data-v="'+i+'" aria-label="지우기">×</button></li>'; }).join("")+'</ul>' : '')+
-    '<label class="pc-up"><input type="file" accept="application/pdf" multiple data-pdf="pol"><span>'+ico("plus")+'증권 PDF 올리기</span></label>'+
-    (pol.length? '<button class="pc-apply" data-act="polApply">보장분석 탭에 반영</button>' : '')+
+    '<label class="pc-drop'+(pol.length?' sm':'')+'" id="pc-drop"><input type="file" accept="application/pdf" multiple data-pdf="pol"><span class="pc-di">'+ico("plus")+'</span><b>'+(pol.length?'증권 더 올리기':'증권 PDF 올리기')+'</b>'+(pol.length?'':'<span>눌러서 고르거나, 파일을 여기로 끌어다 놓아요 · 방금 받은 증권은 ‘최근 항목’ 맨 위에 있어요</span>')+'</label>'+
+    (pol.length? '<button class="pc-apply" data-act="polApply">보장분석 탭에도 반영</button>' : '')+
     '<p class="pc-safe">아이패드 안에서만 읽고, 어디에도 저장하지 않아요 · 앱을 닫으면 지워져요</p></div>';
-  var planCard='<div class="pc-card"><div class="pc-h"><span class="pc-n">2</span><div><b>풀담보 설계</b><span>보장 빠짐없이 짠 설계서를 한 번 올려 두면 계속 써요</span></div></div>'+
-    (plans.length? '<div class="pc-plans">'+plans.map(function(p){ var on=sel&&p.id===sel.id; return '<button class="pc-pl'+(on?' on':'')+'" data-act="planSel" data-v="'+p.id+'" aria-pressed="'+on+'"><b>'+esc(p.ins||"보험사")+'</b><span>'+esc(shortNm(p.prod).slice(0,24))+'</span><em>'+(p.age?'기준 '+p.age+'세 '+(p.sex||""):'')+'</em></button>'; }).join("")+'</div>' : '')+
-    '<label class="pc-up"><input type="file" accept="application/pdf" data-pdf="plan"><span>'+ico("plus")+'설계서 PDF 올리기</span></label></div>';
+  var mgr='<div class="pc-mgr"><button class="pc-mgr-h" data-act="planMgr" aria-expanded="'+!!S.planMgr+'"><b>풀담보 설계 관리</b><span>'+plans.length+'개 · '+plans.map(function(p){ return (p.age?p.age+'세 ':'')+(p.sex||''); }).join(", ")+'</span><i aria-hidden="true">'+(S.planMgr?'−':'＋')+'</i></button>'+
+    (S.planMgr? '<div class="pc-mgr-b">'+(plans.length? '<div class="pc-plans">'+plans.map(function(p){ var on=sel&&p.id===sel.id; return '<button class="pc-pl'+(on?' on':'')+'" data-act="planSel" data-v="'+p.id+'" aria-pressed="'+on+'"><b>'+esc(p.ins||"보험사")+'</b><span>'+esc(shortNm(p.prod).slice(0,24))+'</span><em>'+(p.age?'기준 '+p.age+'세 '+(p.sex||""):'')+'</em></button>'; }).join("")+'</div>' : '')+
+      '<div class="pc-mgr-a"><label class="pc-up"><input type="file" accept="application/pdf" data-pdf="plan"><span>'+ico("plus")+'풀담보 설계서 올리기</span></label>'+(sel?'<button class="ghost" data-act="planEdit" aria-pressed="'+!!S.planEdit+'">'+(S.planEdit?'다 고쳤어요':'선택한 풀담보 담보 고치기')+'</button>':'')+'</div></div>' : '')+'</div>';
   var status= busy? '<p class="pc-busy">PDF를 읽는 중이에요…</p>' : err? '<p class="pc-err">'+esc(err)+'</p>' : '';
   var cmp='';
-  if(sel){ var edit=!!S.planEdit, inc=0, cnt=0, groups={}, order=[];
+  if(sel&&(pol.length||S.planEdit)){ var edit=!!S.planEdit, inc=0, cnt=0, groups={}, order=[];
     sel.rows.forEach(function(r,i){ var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타";
       if(!groups[g]){ groups[g]=[]; order.push(g); } groups[g].push({r:r,i:i,j:j,on:on}); if(on){ inc+=r[4]||0; cnt++; } });
     var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
@@ -3620,8 +3636,8 @@ function planHTML(){
       '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료 (대략)</span><b class="num">약 '+inc.toLocaleString("ko-KR")+'원</b></div><div><span>풀담보 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
         (room? '<div class="'+(inc<=room?'ok':'bad')+'"><span>보완에 쓸 수 있는 돈</span><b class="num">'+room.toLocaleString("ko-KR")+'원 '+(inc<=room?'안':'초과')+'</b></div>':'')+'</div>'+
       '<p class="src">보험료는 풀담보 설계서 기준'+(sel.age?' ('+sel.age+'세 '+(sel.sex||"")+')':'')+'의 대략적인 금액이에요 · 고객 나이·직업(상해급수)에 따라 달라지니, 정해지면 다시 설계해요. 담보 이름이 같은 것끼리 금액을 비교하고, 이름이 달라도 같은 종류면 ‘비슷한 담보’로 보여 줘요.</p></div>';
-  } else cmp='<div class="ls-empty card"><b>풀담보 설계서를 한 번 올려 주세요</b><span class="d">한 번 올려 두면 계속 남아 있어요. 상담 때 고객 증권만 올리면 바로 비교돼요.</span></div>';
-  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+'<div class="pc-top">'+polCard+planCard+'</div>'+status+cmp+'</div>'; }
+  } else if(!plans.length) cmp='<div class="ls-empty card"><b>풀담보 설계가 아직 없어요</b><span class="d">아래 ‘풀담보 설계 관리’에서 한 번만 올려 두면 계속 써요.</span></div>';
+  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+polCard+status+cmp+mgr+'</div>'; }
 var PLAN_PAGE={title:"설계 비교", html:planHTML,
   notes:function(){ return N("say","지금 가지고 계신 보험이랑, 제가 준비한 안을 나란히 놓고 볼게요.")+N("q","이미 충분한 건 빼고, 비어 있는 곳만 채우면 한 달에 이 정도예요. 어떠세요?")+
     N("tip","‘충분’은 같은 이름의 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. ‘비슷한 담보’는 이름은 다르지만 같은 종류라, 약관 범위를 보고 직접 판단해요.")+
@@ -3636,7 +3652,7 @@ function pdfUpload(kind, files){ if(!files||!files.length) return; S.pdfBusy=tru
     else { var r=got[0]; if(!r||!r.rows.length||r.kind!=="plan"){ S.pdfErr="설계서에서 담보와 보험료를 못 읽었어요 · ‘가입담보 리스트’가 있는 제안서 PDF인지 확인해 주세요"; }
       else { var d=new Date(), id="p"+Date.now().toString(36), p={id:id, ins:r.ins, prod:r.prod, age:r.age, sex:r.sex, date:d.getFullYear()+"."+(d.getMonth()+1), total:r.total,
           rows:r.rows.map(function(x){ return [x.nm,x.cat,x.term,x.amt,x.prem,x.id,1]; })};
-        cfg.plans=planList().concat([p]); saveCfg(); S.planSel=id; S.planEdit=true; S.planOn={};
+        cfg.plans=planList().concat([p]); saveCfg(); S.planSel=id; S.planPick=true; S.planEdit=true; S.planMgr=true; S.planOn={};
         if(r.total&&r.sum!==r.total) S.pdfErr="담보 보험료 합계("+r.sum.toLocaleString("ko-KR")+"원)가 설계서 합계("+r.total.toLocaleString("ko-KR")+"원)와 달라요 · 빠진 담보가 없는지 확인해 주세요"; } }
     render(); if(S._scrollCmp){ S._scrollCmp=false; setTimeout(function(){ var el=document.querySelector(".pc-cmp"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); } }).catch(function(e){ S.pdfBusy=false; S.pdfErr= (e&&e.message==="load")? "PDF 읽기 도구를 못 불러왔어요 · 인터넷 연결을 확인해 주세요" : "PDF를 읽지 못했어요 · 비밀번호가 걸린 파일인지 확인해 주세요"; render(); }); }
 var TABS = [
@@ -3797,6 +3813,7 @@ document.addEventListener("click",function(e){
   else if(a==="planSel"){ S.planSel=b.dataset.v; S.planPick=true; S.planOn={}; S.planEdit=false; render(); }
   else if(a==="planAuto"){ S.planSel=""; S.planPick=false; S.planOn={}; render(); }
   else if(a==="planEdit"){ S.planEdit=!S.planEdit; render(); }
+  else if(a==="planMgr"){ S.planMgr=!S.planMgr; render(); }
   else if(a==="planReset"){ S.planOn={}; render(); }
   else if(a==="planDel"){ if(S.planDelAsk!==b.dataset.v){ S.planDelAsk=b.dataset.v; b.textContent="한 번 더 누르면 지워져요"; return; } cfg.plans=planList().filter(function(p){ return p.id!==b.dataset.v; }); saveCfg(); S.planSel=""; S.planEdit=false; S.planDelAsk=""; render(); }
   else if(a==="planTog"){ var sp=planById(S.planSel)||autoPlan(); if(!sp) return; var ri=+b.dataset.v, jj=judge(sp.rows[ri]); S.planOn=S.planOn||{}; S.planOn[sp.id+"_"+ri]=!planOn(sp,ri,jj); render(); }
@@ -3887,6 +3904,9 @@ document.addEventListener("input",function(e){
   else if(t.dataset&&t.dataset.s){ var k=t.dataset.s; S[k]=t.value.replace(/[^0-9.]/g,""); if(k==="salary"&&!S.mTouched&&num(S.salary)) S.monthly=Math.round(num(S.salary)/12); render(); }
   else if(t.dataset&&t.dataset.cfg){ var c=t.dataset.cfg; cfg[c]=(typeof DEF[c]==="string")? t.value : (num(t.value)||0); saveCfg(); }
 });
+document.addEventListener("dragover",function(e){ var z=e.target.closest&&e.target.closest("#pc-drop"); if(z){ e.preventDefault(); z.classList.add("over"); } });
+document.addEventListener("dragleave",function(e){ var z=e.target.closest&&e.target.closest("#pc-drop"); if(z) z.classList.remove("over"); });
+document.addEventListener("drop",function(e){ var z=e.target.closest&&e.target.closest("#pc-drop"); if(!z) return; e.preventDefault(); var fs=Array.prototype.filter.call(e.dataTransfer.files||[],function(f){ return /pdf$/i.test(f.type)||/\.pdf$/i.test(f.name); }); if(fs.length) pdfUpload("pol",fs); });
 document.addEventListener("change",function(e){
   if(e.target.dataset&&e.target.dataset.cage){ if(!S.planPick) S.planSel=""; S.planOn={}; render(); return; }
   if(e.target.dataset&&e.target.dataset.pdf){ var fl=e.target.files; pdfUpload(e.target.dataset.pdf, fl); return; }
