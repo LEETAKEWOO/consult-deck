@@ -1958,6 +1958,12 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 @media (max-width:760px){.pc-sum{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px 14px}.pc-sum b{font-size:16px}}
 .pc-sum .ok b{color:#7BE0A8}.pc-sum .bad b{color:#FF9A9E}
 @media (max-width:760px){.pc-head{display:none}.pc-r{grid-template-columns:minmax(0,1fr) auto 52px;row-gap:6px}.pc-r > span:nth-child(2),.pc-r > span:nth-child(3){display:none}.pc-r > span:nth-child(4){grid-column:1;grid-row:2;text-align:left}.pc-r > span:nth-child(5){grid-column:2;grid-row:1}.pc-sw{grid-column:3;grid-row:1/3}}
+.pc-who{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 14px;border-radius:14px;background:var(--bg);margin-bottom:6px}
+.pc-who label{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.pc-who input{width:64px;height:38px;border:1px solid var(--line);border-radius:10px;text-align:center;font-weight:800;font-size:16px;background:var(--card)}
+.pc-auto{font-size:13px;color:var(--muted);font-weight:600}
+.pc-auto .lnk{border:0;background:none;color:var(--tc);font-weight:800;cursor:pointer;padding:0;text-decoration:underline}
+.pc-ch b small{font-size:13px;font-weight:700;color:var(--muted);margin-left:6px}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3522,6 +3528,7 @@ function parsePlanItems(items){
   var prod=""; for(var k=0;k<items.length;k++){ if(/무배당|보험\(\d\d\.\d\d\)|종합보험|건강보험/.test(items[k].s)&&items[k].s.length>8){ prod=items[k].s.trim(); var nx=items[k+1]; if(nx&&nx.p===items[k].p&&Math.abs(nx.y-items[k].y)<16&&Math.abs(nx.x-items[k].x)<3&&/^[^가-힣]*[가-힣]/.test(nx.s)&&nx.s.length<40&&/\)$/.test(nx.s.trim())) prod+=nx.s.trim(); break; } }
   var ins=insurerOf(text);
   var age=(/나이:(\d+)세/.exec(text)||[])[1]||"", sex=(/성별:(남자|여자)/.exec(text)||[])[1]||"";
+  if(!age){ var rr=/(\d{2})(\d{2})(\d{2})-([1-4])/.exec(text); if(rr){ var yy=+rr[1]+(rr[4]<"3"?1900:2000), now=new Date(), a0=now.getFullYear()-yy-((now.getMonth()+1<+rr[2]||(now.getMonth()+1===+rr[2]&&now.getDate()<+rr[3]))?1:0); age=String(a0); sex=(rr[4]==="1"||rr[4]==="3")?"남자":"여자"; } }
   var rows=[], kind="";
   /* A. 제안서 '가입담보 리스트': 시작 표시부터 '보장보험료 합계'까지, 여러 쪽 이어짐 */
   var ord=items.slice().sort(function(p,q){ return p.p-q.p||p.y-q.y||p.x-q.x; });
@@ -3566,6 +3573,8 @@ function readPdfFile(file){ return loadPdfJs().then(function(lib){ return file.a
   return lib.getDocument({data:new Uint8Array(buf), cMapUrl:"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/"+PDFJS_V+"/cmaps/", cMapPacked:true}).promise; }); }).then(function(doc){ return pdfItems(doc); }).then(function(items){ return parsePlanItems(items); }); }
 var COV_NM={}; CKG.forEach(function(g){ g.r.forEach(function(r){ COV_NM[r[0]]={nm:r[1],g:g.g}; }); });
 function shortNm(n){ return (n||"").replace(/\((건강고지형|추가고지형|간편고지형|일반고지형)\)/g,"").replace(/\(갱신형_\d+년\)/g,"").replace(/^\[갱신형\]/,"[갱신] "); }
+function autoPlan(){ var L=planList(), a=+S.cAge||0; if(!L.length) return null; if(!a) return L[0];
+  return L.slice().sort(function(p,q){ var dp=Math.abs((+p.age||0)-a)+(S.cSex&&p.sex!==S.cSex?.5:0), dq=Math.abs((+q.age||0)-a)+(S.cSex&&q.sex!==S.cSex?.5:0); return dp-dq; })[0]; }
 function planList(){ return Array.isArray(cfg.plans)? cfg.plans : []; }
 function planById(id){ return planList().filter(function(p){ return p.id===id; })[0]; }
 function polRows(){ var out=[]; (S.pol||[]).forEach(function(p){ p.rows.forEach(function(r){ out.push(r); }); }); return out; }
@@ -3581,7 +3590,7 @@ function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
   return {k:"e",t:"",cur:0}; }
 function planOn(p,i,j){ var o=(S.planOn||{})[p.id+"_"+i]; if(o!==undefined) return o; if(!p.rows[i][6]) return false; return j.k!=="ok"; }
 function planHTML(){
-  var plans=planList(), sel=planById(S.planSel)||plans[0], pol=S.pol||[], busy=S.pdfBusy, err=S.pdfErr;
+  var plans=planList(), sel=planById(S.planSel)||autoPlan(), pol=S.pol||[], busy=S.pdfBusy, err=S.pdfErr;
   var polCard='<div class="pc-card"><div class="pc-h"><span class="pc-n">1</span><div><b>고객이 가진 보험</b><span>증권 PDF를 올리면 담보를 읽어 와요</span></div></div>'+
     (pol.length? '<ul class="pc-pol">'+pol.map(function(p,i){ return '<li><div><b>'+esc(p.ins||"보험사 확인 필요")+'</b><span>'+esc(shortNm(p.prod)||"상품명 확인 필요")+'</span></div><em class="num">'+(p.total?p.total.toLocaleString("ko-KR")+'원':'')+'</em><small>담보 '+p.rows.length+'개</small><button class="pc-x" data-act="polDel" data-v="'+i+'" aria-label="지우기">×</button></li>'; }).join("")+'</ul>' : '')+
     '<label class="pc-up"><input type="file" accept="application/pdf" multiple data-pdf="pol"><span>'+ico("plus")+'증권 PDF 올리기</span></label>'+
@@ -3597,7 +3606,10 @@ function planHTML(){
       if(!groups[g]){ groups[g]=[]; order.push(g); } groups[g].push({r:r,i:i,j:j,on:on}); if(on){ inc+=r[4]||0; cnt++; } });
     var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
     var full=sel.rows.reduce(function(s,r){ return s+(r[6]?(r[4]||0):0); },0), mx=num(S.maxPrem), cp=num(S.curPrem)||0, room=mx? Math.max(0,mx-cp)*10000 : 0;
-    cmp='<div class="pc-cmp"><div class="pc-ch"><div><b>'+esc(sel.ins)+' · '+esc(shortNm(sel.prod))+'</b><span>'+(edit?'풀담보에 넣을 담보를 골라요 · 바꾸면 다음 고객에게도 그대로 써요':'고객 보험과 나란히 놓고, 필요 없는 담보를 빼요')+'</span></div>'+
+    var who='<div class="pc-who"><label>고객 나이 <input id="pc-age" data-cage="1" inputmode="numeric" value="'+esc(S.cAge||"")+'" placeholder="—">세</label>'+
+      '<div class="seg">'+["남자","여자"].map(function(x){ return '<button data-act="cSex" data-v="'+x+'" aria-pressed="'+(S.cSex===x)+'">'+x.charAt(0)+'</button>'; }).join("")+'</div>'+
+      '<span class="pc-auto">'+(S.planPick? '직접 고른 풀담보 · <button class="lnk" data-act="planAuto">나이에 맞춰 고르기</button>' : (S.cAge? '나이에 가장 가까운 풀담보로 자동 비교 중' : '증권을 올리면 나이를 읽어서 맞는 풀담보를 골라요'))+'</span></div>';
+    cmp='<div class="pc-cmp">'+who+'<div class="pc-ch"><div><b>'+esc(sel.ins)+' · '+esc(shortNm(sel.prod))+(sel.age?' <small>기준 '+sel.age+'세 '+(sel.sex||"")+'</small>':'')+'</b><span>'+(edit?'풀담보에 넣을 담보를 골라요 · 바꾸면 다음 고객에게도 그대로 써요':'고객 보험과 나란히 놓고, 필요 없는 담보를 빼요')+'</span></div>'+
       '<div class="pc-tools"><button class="ghost" data-act="planEdit" aria-pressed="'+edit+'">'+(edit?'다 고쳤어요':'풀담보 고치기')+'</button>'+(edit?'<button class="ghost danger" data-act="planDel" data-v="'+sel.id+'">이 풀담보 지우기</button>':'<button class="ghost" data-act="planReset">처음 상태로</button>')+'</div></div>'+
       '<div class="pc-head"><span>담보</span><span>풀담보</span><span>고객 지금</span><span>판단</span><span>보험료</span><span></span></div>'+
       order.map(function(g){ return '<div class="pc-g"><h4>'+esc(g)+'</h4>'+groups[g].map(function(o){ var r=o.r, j=o.j;
@@ -3605,9 +3617,9 @@ function planHTML(){
           '<span class="num pc-cur">'+(j.cur?wonTxt(j.cur):(j.k==="sim"?'비슷한 담보':'—'))+'</span>'+
           '<span>'+(edit?'':(j.t?'<em class="pc-j '+j.k+'">'+j.t+'</em>':''))+'</span><span class="num">'+(r[4]?r[4].toLocaleString("ko-KR")+'원':'')+'</span>'+
           '<button class="pc-sw" role="switch" aria-checked="'+o.on+'" data-act="'+(edit?'planDef':'planTog')+'" data-v="'+o.i+'" aria-label="'+esc(shortNm(r[0]))+'"><i></i></button></div>'; }).join("")+'</div>'; }).join("")+
-      '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료</span><b class="num">'+inc.toLocaleString("ko-KR")+'원</b></div><div><span>풀담보 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
+      '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료 (대략)</span><b class="num">약 '+inc.toLocaleString("ko-KR")+'원</b></div><div><span>풀담보 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
         (room? '<div class="'+(inc<=room?'ok':'bad')+'"><span>보완에 쓸 수 있는 돈</span><b class="num">'+room.toLocaleString("ko-KR")+'원 '+(inc<=room?'안':'초과')+'</b></div>':'')+'</div>'+
-      '<p class="src">보험료는 설계서 기준'+(sel.age?' ('+sel.age+'세 '+(sel.sex||"")+')':'')+'이에요 · 고객 나이·성별로 다시 설계하면 달라져요. 담보 이름이 같은 것끼리 금액을 비교하고, 이름이 달라도 같은 종류면 ‘비슷한 담보’로 보여 줘요.</p></div>';
+      '<p class="src">보험료는 풀담보 설계서 기준'+(sel.age?' ('+sel.age+'세 '+(sel.sex||"")+')':'')+'의 대략적인 금액이에요 · 고객 나이·직업(상해급수)에 따라 달라지니, 정해지면 다시 설계해요. 담보 이름이 같은 것끼리 금액을 비교하고, 이름이 달라도 같은 종류면 ‘비슷한 담보’로 보여 줘요.</p></div>';
   } else cmp='<div class="ls-empty card"><b>풀담보 설계서를 한 번 올려 주세요</b><span class="d">한 번 올려 두면 계속 남아 있어요. 상담 때 고객 증권만 올리면 바로 비교돼요.</span></div>';
   return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+'<div class="pc-top">'+polCard+planCard+'</div>'+status+cmp+'</div>'; }
 var PLAN_PAGE={title:"설계 비교", html:planHTML,
@@ -3619,6 +3631,7 @@ function pdfUpload(kind, files){ if(!files||!files.length) return; S.pdfBusy=tru
   list.forEach(function(f){ P=P.then(function(){ return readPdfFile(f).then(function(r){ got.push(r); }); }); });
   P.then(function(){ S.pdfBusy=false;
     if(kind==="pol"){ var bad=got.filter(function(r){ return !r.rows.length; }).length; S.pol=(S.pol||[]).concat(got.filter(function(r){ return r.rows.length; }).map(function(r){ return {ins:r.ins,prod:r.prod,total:r.total,rows:r.rows}; }));
+      got.forEach(function(r){ if(r.age&&!S.cAgeSet){ S.cAge=r.age; S.cSex=r.sex; } }); if(!S.planPick) S.planSel="";
       if(bad) S.pdfErr="담보를 못 읽은 파일이 "+bad+"개 있어요 · 글자가 들어 있는 증권 PDF인지 확인해 주세요";  S._scrollCmp=true; }
     else { var r=got[0]; if(!r||!r.rows.length||r.kind!=="plan"){ S.pdfErr="설계서에서 담보와 보험료를 못 읽었어요 · ‘가입담보 리스트’가 있는 제안서 PDF인지 확인해 주세요"; }
       else { var d=new Date(), id="p"+Date.now().toString(36), p={id:id, ins:r.ins, prod:r.prod, age:r.age, sex:r.sex, date:d.getFullYear()+"."+(d.getMonth()+1), total:r.total,
@@ -3781,12 +3794,14 @@ document.addEventListener("click",function(e){
   else if(a==="goTopic"){ goTopic(b.dataset.v); }
   else if(a==="polDel"){ S.pol.splice(+b.dataset.v,1); render(); }
   else if(a==="polApply"){ S.ck=S.ck||{}; S.ckOpen=Object.assign({},S.ckOpen); polRows().forEach(function(r){ if(!r.id||!CK_G[r.id]) return; S.ck[r.id]="y"; S.ckOpen[CK_G[r.id]]=true; }); S.pdfErr=""; go(tabIdx("anal"),0); }
-  else if(a==="planSel"){ S.planSel=b.dataset.v; S.planOn={}; S.planEdit=false; render(); }
+  else if(a==="planSel"){ S.planSel=b.dataset.v; S.planPick=true; S.planOn={}; S.planEdit=false; render(); }
+  else if(a==="planAuto"){ S.planSel=""; S.planPick=false; S.planOn={}; render(); }
   else if(a==="planEdit"){ S.planEdit=!S.planEdit; render(); }
   else if(a==="planReset"){ S.planOn={}; render(); }
   else if(a==="planDel"){ if(S.planDelAsk!==b.dataset.v){ S.planDelAsk=b.dataset.v; b.textContent="한 번 더 누르면 지워져요"; return; } cfg.plans=planList().filter(function(p){ return p.id!==b.dataset.v; }); saveCfg(); S.planSel=""; S.planEdit=false; S.planDelAsk=""; render(); }
-  else if(a==="planTog"){ var sp=planById(S.planSel)||planList()[0]; if(!sp) return; var ri=+b.dataset.v, jj=judge(sp.rows[ri]); S.planOn=S.planOn||{}; S.planOn[sp.id+"_"+ri]=!planOn(sp,ri,jj); render(); }
-  else if(a==="planDef"){ var dp=planById(S.planSel)||planList()[0]; if(!dp) return; cfg.plans=planList().map(function(p){ if(p.id!==dp.id) return p; var q=JSON.parse(JSON.stringify(p)); q.rows[+b.dataset.v][6]=q.rows[+b.dataset.v][6]?0:1; return q; }); saveCfg(); render(); }
+  else if(a==="planTog"){ var sp=planById(S.planSel)||autoPlan(); if(!sp) return; var ri=+b.dataset.v, jj=judge(sp.rows[ri]); S.planOn=S.planOn||{}; S.planOn[sp.id+"_"+ri]=!planOn(sp,ri,jj); render(); }
+  else if(a==="planDef"){ var dp=planById(S.planSel)||autoPlan(); if(!dp) return; cfg.plans=planList().map(function(p){ if(p.id!==dp.id) return p; var q=JSON.parse(JSON.stringify(p)); q.rows[+b.dataset.v][6]=q.rows[+b.dataset.v][6]?0:1; return q; }); saveCfg(); render(); }
+  else if(a==="cSex"){ S.cSex=b.dataset.v; S.cAgeSet=true; render(); }
   else if(a==="ccType"){ S.cct=b.dataset.v; render(); }
   else if(a==="jgo"){ var jv=b.dataset.v; if(jv==="vessel"&&!HEALTH.some(function(h){ return S.seen[h]; })) S.first="brain"; goTopic(jv); }
   else if(a==="lsJob"){ S.ls=S.ls||{}; S.ls.job=(S.ls.job===b.dataset.v?"":b.dataset.v); render(); }
@@ -3859,6 +3874,7 @@ document.addEventListener("input",function(e){
   var t=e.target;
   if(t.id==="monthly"){ var v=num(t.value); S.monthly=v||0; S.mTouched=true; render(); }
   else if(t.dataset&&t.dataset.txt){ S[t.dataset.txt]=t.value; }
+  else if(t.dataset&&t.dataset.cage){ S.cAge=t.value.replace(/[^0-9]/g,""); S.cAgeSet=true; }
   else if(t.dataset&&t.dataset.ccq){ S.ccq=t.value; var cl=$("cc-list"); if(cl) cl.innerHTML=ccList(); }
   else if(t.dataset&&t.dataset.arsmy){ cfg.arsMy=Object.assign({},cfg.arsMy); var nm=t.dataset.arsmy, v=t.value.trim(); if(v) cfg.arsMy[nm]=v; else delete cfg.arsMy[nm]; saveCfg(); }
   else if(t.dataset&&t.dataset.sil){ S.silD=t.value||""; var sg=silGen(S.silD); if(sg&&sg.id!=="g12"){ S.ck=S.ck||{}; if(!S.ck.ba1) S.ck.ba1="y"; S.ckc=S.ckc||{}; S.ckc.ba1_0=(/^g[12]/.test(sg.id))?"y":"n"; } render(); }
@@ -3872,6 +3888,7 @@ document.addEventListener("input",function(e){
   else if(t.dataset&&t.dataset.cfg){ var c=t.dataset.cfg; cfg[c]=(typeof DEF[c]==="string")? t.value : (num(t.value)||0); saveCfg(); }
 });
 document.addEventListener("change",function(e){
+  if(e.target.dataset&&e.target.dataset.cage){ if(!S.planPick) S.planSel=""; S.planOn={}; render(); return; }
   if(e.target.dataset&&e.target.dataset.pdf){ var fl=e.target.files; pdfUpload(e.target.dataset.pdf, fl); return; }
   if(e.target.id!=="cfg-photo") return; var f=e.target.files&&e.target.files[0]; if(!f) return;
   var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var z=320,cv=document.createElement("canvas"); cv.width=z; cv.height=z; var m=Math.min(img.width,img.height); cv.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,z,z); cfg.photo=cv.toDataURL("image/jpeg",.85); saveCfg(); buildSheet(); }; img.src=rd.result; }; rd.readAsDataURL(f);
