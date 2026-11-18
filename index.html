@@ -3555,7 +3555,7 @@ function parsePlanItems(items){
   rows.forEach(function(r){ r.id=mapCov(r.nm); r.key=normKey(r.nm); });
   var sum=rows.reduce(function(s,r){ return s+(r.prem||0); },0);
   return {kind:kind, ins:ins, prod:prod, age:age, sex:sex, rows:rows, total:tot, sum:sum}; }
-/* ================= 설계 비교 (고객 증권 vs 이번 달 기본안) ================= */
+/* ================= 설계 비교 (고객 증권 vs 풀담보) ================= */
 IC.plus='<path d="M12 5v14M5 12h14"/>';
 IC.compare='<rect x="3.5" y="4" width="7" height="16" rx="2"/><rect x="13.5" y="4" width="7" height="16" rx="2"/><path d="M6 8.5h2M6 12h2M16 8.5h2M16 12h2"/>';
 var PDFJS_V="3.11.174";
@@ -3569,7 +3569,7 @@ function shortNm(n){ return (n||"").replace(/\((건강고지형|추가고지형|
 function planList(){ return Array.isArray(cfg.plans)? cfg.plans : []; }
 function planById(id){ return planList().filter(function(p){ return p.id===id; })[0]; }
 function polRows(){ var out=[]; (S.pol||[]).forEach(function(p){ p.rows.forEach(function(r){ out.push(r); }); }); return out; }
-function judge(r){ /* r: 기본안 담보 [nm,cat,term,amt,prem,id,on] */
+function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
   var pr=polRows(), key=normKey(r[0]), same=pr.filter(function(x){ return x.key===key; }), have=same.reduce(function(s,x){ return s+x.amt; },0);
   if(same.length){ return have>=r[3]? {k:"ok",t:"충분",cur:have} : {k:"low",t:"부족",cur:have}; }
   var sim=r[5]? pr.filter(function(x){ return x.id===r[5]; }) : [];
@@ -3587,8 +3587,8 @@ function planHTML(){
     '<label class="pc-up"><input type="file" accept="application/pdf" multiple data-pdf="pol"><span>'+ico("plus")+'증권 PDF 올리기</span></label>'+
     (pol.length? '<button class="pc-apply" data-act="polApply">보장분석 탭에 반영</button>' : '')+
     '<p class="pc-safe">아이패드 안에서만 읽고, 어디에도 저장하지 않아요 · 앱을 닫으면 지워져요</p></div>';
-  var planCard='<div class="pc-card"><div class="pc-h"><span class="pc-n">2</span><div><b>이번 달 기본안</b><span>보장 빠짐없이 짠 설계서를 올려 두면 계속 써요</span></div></div>'+
-    (plans.length? '<div class="pc-plans">'+plans.map(function(p){ var on=sel&&p.id===sel.id; return '<button class="pc-pl'+(on?' on':'')+'" data-act="planSel" data-v="'+p.id+'" aria-pressed="'+on+'"><b>'+esc(p.ins||"보험사")+'</b><span>'+esc(shortNm(p.prod).slice(0,24))+'</span><em>'+esc(p.date||"")+(p.age?' · '+p.age+'세 '+(p.sex||""):'')+'</em></button>'; }).join("")+'</div>' : '')+
+  var planCard='<div class="pc-card"><div class="pc-h"><span class="pc-n">2</span><div><b>풀담보 설계</b><span>보장 빠짐없이 짠 설계서를 한 번 올려 두면 계속 써요</span></div></div>'+
+    (plans.length? '<div class="pc-plans">'+plans.map(function(p){ var on=sel&&p.id===sel.id; return '<button class="pc-pl'+(on?' on':'')+'" data-act="planSel" data-v="'+p.id+'" aria-pressed="'+on+'"><b>'+esc(p.ins||"보험사")+'</b><span>'+esc(shortNm(p.prod).slice(0,24))+'</span><em>'+(p.age?'기준 '+p.age+'세 '+(p.sex||""):'')+'</em></button>'; }).join("")+'</div>' : '')+
     '<label class="pc-up"><input type="file" accept="application/pdf" data-pdf="plan"><span>'+ico("plus")+'설계서 PDF 올리기</span></label></div>';
   var status= busy? '<p class="pc-busy">PDF를 읽는 중이에요…</p>' : err? '<p class="pc-err">'+esc(err)+'</p>' : '';
   var cmp='';
@@ -3597,35 +3597,35 @@ function planHTML(){
       if(!groups[g]){ groups[g]=[]; order.push(g); } groups[g].push({r:r,i:i,j:j,on:on}); if(on){ inc+=r[4]||0; cnt++; } });
     var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
     var full=sel.rows.reduce(function(s,r){ return s+(r[6]?(r[4]||0):0); },0), mx=num(S.maxPrem), cp=num(S.curPrem)||0, room=mx? Math.max(0,mx-cp)*10000 : 0;
-    cmp='<div class="pc-cmp"><div class="pc-ch"><div><b>'+esc(sel.ins)+' · '+esc(shortNm(sel.prod))+'</b><span>'+(edit?'기본안에 넣을 담보를 골라요 · 여기서 바꾸면 다음 고객에게도 그대로 써요':'고객 보험과 나란히 놓고, 필요 없는 담보를 빼요')+'</span></div>'+
-      '<div class="pc-tools"><button class="ghost" data-act="planEdit" aria-pressed="'+edit+'">'+(edit?'다 고쳤어요':'기본안 고치기')+'</button>'+(edit?'<button class="ghost danger" data-act="planDel" data-v="'+sel.id+'">이 기본안 지우기</button>':'<button class="ghost" data-act="planReset">처음 상태로</button>')+'</div></div>'+
-      '<div class="pc-head"><span>담보</span><span>기본안</span><span>고객 지금</span><span>판단</span><span>보험료</span><span></span></div>'+
+    cmp='<div class="pc-cmp"><div class="pc-ch"><div><b>'+esc(sel.ins)+' · '+esc(shortNm(sel.prod))+'</b><span>'+(edit?'풀담보에 넣을 담보를 골라요 · 바꾸면 다음 고객에게도 그대로 써요':'고객 보험과 나란히 놓고, 필요 없는 담보를 빼요')+'</span></div>'+
+      '<div class="pc-tools"><button class="ghost" data-act="planEdit" aria-pressed="'+edit+'">'+(edit?'다 고쳤어요':'풀담보 고치기')+'</button>'+(edit?'<button class="ghost danger" data-act="planDel" data-v="'+sel.id+'">이 풀담보 지우기</button>':'<button class="ghost" data-act="planReset">처음 상태로</button>')+'</div></div>'+
+      '<div class="pc-head"><span>담보</span><span>풀담보</span><span>고객 지금</span><span>판단</span><span>보험료</span><span></span></div>'+
       order.map(function(g){ return '<div class="pc-g"><h4>'+esc(g)+'</h4>'+groups[g].map(function(o){ var r=o.r, j=o.j;
         return '<div class="pc-r'+(o.on?' on':'')+'"><span class="pc-nm"><b>'+esc(shortNm(r[0]))+'</b>'+(r[2]?'<small>'+esc(r[2])+'</small>':'')+'</span><span class="num">'+wonTxt(r[3])+'</span>'+
           '<span class="num pc-cur">'+(j.cur?wonTxt(j.cur):(j.k==="sim"?'비슷한 담보':'—'))+'</span>'+
           '<span>'+(edit?'':(j.t?'<em class="pc-j '+j.k+'">'+j.t+'</em>':''))+'</span><span class="num">'+(r[4]?r[4].toLocaleString("ko-KR")+'원':'')+'</span>'+
           '<button class="pc-sw" role="switch" aria-checked="'+o.on+'" data-act="'+(edit?'planDef':'planTog')+'" data-v="'+o.i+'" aria-label="'+esc(shortNm(r[0]))+'"><i></i></button></div>'; }).join("")+'</div>'; }).join("")+
-      '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료</span><b class="num">'+inc.toLocaleString("ko-KR")+'원</b></div><div><span>기본안 전체 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
+      '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료</span><b class="num">'+inc.toLocaleString("ko-KR")+'원</b></div><div><span>풀담보 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
         (room? '<div class="'+(inc<=room?'ok':'bad')+'"><span>보완에 쓸 수 있는 돈</span><b class="num">'+room.toLocaleString("ko-KR")+'원 '+(inc<=room?'안':'초과')+'</b></div>':'')+'</div>'+
       '<p class="src">보험료는 설계서 기준'+(sel.age?' ('+sel.age+'세 '+(sel.sex||"")+')':'')+'이에요 · 고객 나이·성별로 다시 설계하면 달라져요. 담보 이름이 같은 것끼리 금액을 비교하고, 이름이 달라도 같은 종류면 ‘비슷한 담보’로 보여 줘요.</p></div>';
-  } else cmp='<div class="ls-empty card"><b>기본안을 먼저 올려 주세요</b><span class="d">매달 1일에 짠 설계서 PDF를 한 번 올려 두면, 고객마다 여기서 빼고 더하며 비교할 수 있어요.</span></div>';
-  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 이번 달 기본안","지금 가진 보험을 읽어 와서, 기본안에서 겹치는 건 빼고 빈 곳만 채워요.")+'<div class="pc-top">'+polCard+planCard+'</div>'+status+cmp+'</div>'; }
+  } else cmp='<div class="ls-empty card"><b>풀담보 설계서를 한 번 올려 주세요</b><span class="d">한 번 올려 두면 계속 남아 있어요. 상담 때 고객 증권만 올리면 바로 비교돼요.</span></div>';
+  return '<div class="slide pc-page">'+head("설계 비교","고객 보험 vs 풀담보","증권을 올리면 풀담보와 바로 비교돼요. 겹치는 건 빼고, 빈 곳만 채워요.")+'<div class="pc-top">'+polCard+planCard+'</div>'+status+cmp+'</div>'; }
 var PLAN_PAGE={title:"설계 비교", html:planHTML,
   notes:function(){ return N("say","지금 가지고 계신 보험이랑, 제가 준비한 안을 나란히 놓고 볼게요.")+N("q","이미 충분한 건 빼고, 비어 있는 곳만 채우면 한 달에 이 정도예요. 어떠세요?")+
     N("tip","‘충분’은 같은 이름의 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. ‘비슷한 담보’는 이름은 다르지만 같은 종류라, 약관 범위를 보고 직접 판단해요.")+
-    N("tip","고객 증권은 저장하지 않아요. 기본안은 폰·아이패드에 같이 저장돼요(고객 이름·설계번호는 저장 안 함)."); }};
+    N("tip","고객 증권은 저장하지 않아요. 풀담보 설계는 폰·아이패드에 같이 저장돼서 계속 남아 있어요(고객 이름·설계번호는 저장 안 함)."); }};
 function pdfUpload(kind, files){ if(!files||!files.length) return; S.pdfBusy=true; S.pdfErr=""; render();
   var list=Array.prototype.slice.call(files), P=Promise.resolve(), got=[];
   list.forEach(function(f){ P=P.then(function(){ return readPdfFile(f).then(function(r){ got.push(r); }); }); });
   P.then(function(){ S.pdfBusy=false;
     if(kind==="pol"){ var bad=got.filter(function(r){ return !r.rows.length; }).length; S.pol=(S.pol||[]).concat(got.filter(function(r){ return r.rows.length; }).map(function(r){ return {ins:r.ins,prod:r.prod,total:r.total,rows:r.rows}; }));
-      if(bad) S.pdfErr="담보를 못 읽은 파일이 "+bad+"개 있어요 · 글자가 들어 있는 증권 PDF인지 확인해 주세요"; }
+      if(bad) S.pdfErr="담보를 못 읽은 파일이 "+bad+"개 있어요 · 글자가 들어 있는 증권 PDF인지 확인해 주세요";  S._scrollCmp=true; }
     else { var r=got[0]; if(!r||!r.rows.length||r.kind!=="plan"){ S.pdfErr="설계서에서 담보와 보험료를 못 읽었어요 · ‘가입담보 리스트’가 있는 제안서 PDF인지 확인해 주세요"; }
       else { var d=new Date(), id="p"+Date.now().toString(36), p={id:id, ins:r.ins, prod:r.prod, age:r.age, sex:r.sex, date:d.getFullYear()+"."+(d.getMonth()+1), total:r.total,
           rows:r.rows.map(function(x){ return [x.nm,x.cat,x.term,x.amt,x.prem,x.id,1]; })};
         cfg.plans=planList().concat([p]); saveCfg(); S.planSel=id; S.planEdit=true; S.planOn={};
         if(r.total&&r.sum!==r.total) S.pdfErr="담보 보험료 합계("+r.sum.toLocaleString("ko-KR")+"원)가 설계서 합계("+r.total.toLocaleString("ko-KR")+"원)와 달라요 · 빠진 담보가 없는지 확인해 주세요"; } }
-    render(); }).catch(function(e){ S.pdfBusy=false; S.pdfErr= (e&&e.message==="load")? "PDF 읽기 도구를 못 불러왔어요 · 인터넷 연결을 확인해 주세요" : "PDF를 읽지 못했어요 · 비밀번호가 걸린 파일인지 확인해 주세요"; render(); }); }
+    render(); if(S._scrollCmp){ S._scrollCmp=false; setTimeout(function(){ var el=document.querySelector(".pc-cmp"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); } }).catch(function(e){ S.pdfBusy=false; S.pdfErr= (e&&e.message==="load")? "PDF 읽기 도구를 못 불러왔어요 · 인터넷 연결을 확인해 주세요" : "PDF를 읽지 못했어요 · 비밀번호가 걸린 파일인지 확인해 주세요"; render(); }); }
 var TABS = [
   {id:"start", name:"시작", ic:"start", c:"var(--t-start)", pages:[{title:"나는 잘 준비하고 있을까",html:pCover,notes:nCover},{title:"보험을 준비하는 순서",html:pJourney,notes:nJourney}]},
   {id:"cancer", name:"암", ic:"cancer", c:"var(--t-cancer)", pages:CANCER},
