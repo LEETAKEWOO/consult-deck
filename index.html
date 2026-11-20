@@ -2050,6 +2050,40 @@ button.whybtn.on{outline:2px solid var(--tc,#1d4ed8)}
 .pc-gs li span{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}.pc-gs li i{font-style:normal;opacity:.4;margin:0 2px}
 .pc-gap,.pc-gh{box-sizing:border-box}.pc-gap{width:100%}
 .pc-sil{margin-top:4px}.pc-sil .sil{margin:0}
+/* 종합: 좋은 담보 / 없는 담보 */
+.cl-hero2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;padding:24px 26px;border-radius:22px;background:linear-gradient(135deg,#06325F 0%,#0B4C8C 100%);color:#fff}
+.h2s{display:flex;flex-direction:column;gap:2px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.08)}
+.h2s span{font-size:14px;font-weight:700}.h2s.y span{color:#86EFAC}.h2s.n span{color:#FFA3A5}
+.h2s b{font-size:clamp(34px,4vw,46px);font-weight:800;letter-spacing:-.04em;line-height:1.1}.h2s b small{font-size:.45em;margin-left:2px;font-weight:700}
+.h2s em{font-style:normal;font-size:13.5px;color:rgba(255,255,255,.78)}
+.h2bar{grid-column:1/-1;display:flex;gap:3px;height:14px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.12)}
+.h2bar i{display:block;height:100%}.h2bar .y{background:#4ADE80}.h2bar .n{background:#FF6B6F}.h2bar .e{background:rgba(255,255,255,.15)}
+.cl-hint{margin:14px 2px 10px;font-size:13.5px;color:var(--muted)}
+.cl-gps{display:flex;flex-direction:column;gap:10px}
+.cl-gp{border-radius:18px;background:var(--card);overflow:hidden}
+.cl-gr{width:100%;box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0,7.5em) minmax(0,1fr) auto auto;gap:14px;align-items:center;border:0;background:transparent;padding:16px 18px;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.cl-gr .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.cl-gr .ic svg{width:20px;height:20px}
+.cl-gr b{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.cl-gb{display:flex;gap:3px;height:10px;border-radius:99px;overflow:hidden;background:var(--card2)}
+.cl-gb i{display:block;height:100%}.cl-gb .y{background:var(--ok)}.cl-gb .n{background:var(--warn)}
+.cl-gn{display:flex;gap:6px}
+.cl-gn em{font-style:normal;font-size:12.5px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.cl-gn .y{background:var(--ok-soft);color:var(--ok)}.cl-gn .n{background:var(--warn-soft);color:var(--warn)}
+.cl-cv{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px}
+.cl-gp.open .cl-cv{transform:rotate(-135deg);margin-top:6px}
+.cl-gd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 18px 18px}
+.cl-col{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:14px;background:var(--bg)}
+.cl-col .lb{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800}
+.cl-col .lb i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;color:#fff}
+.cl-col.y .lb{color:var(--ok)}.cl-col.y .lb i{background:var(--ok)}.cl-col.n .lb{color:var(--warn)}.cl-col.n .lb i{background:var(--warn)}
+.cl-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cl-col li{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px}
+.cl-col li.y{background:var(--ok-soft)}.cl-col li.n{background:var(--warn-soft)}
+.cl-col li b{font-size:13.5px;font-weight:700;line-height:1.35}.cl-col li span{font-size:12px;color:var(--ink2);font-weight:600}
+.cl-col li em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--warn)}
+.cl-col .cl-none{margin:0;font-size:13px;color:var(--muted)}
+@media (max-width:760px){.cl-gd{grid-template-columns:minmax(0,1fr)}.cl-gr{grid-template-columns:auto minmax(0,1fr) auto auto;row-gap:10px}.cl-gb{grid-column:1/-1;grid-row:2}.cl-hero2{padding:18px}}
 </style>
 
 <style>.app{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}</style>
@@ -3510,36 +3544,50 @@ var TOTAL = [
     N("tip","주제를 눌러 펼치고, 증권에 있는 금액을 그대로 넣어요. 앞에서 고객이 스스로 떠올린 ‘?’ 카드를 여기서 확인하는 흐름이에요.")+
     '<h4 style="margin-top:12px">증권 볼 때 확인할 것</h4><ul><li>CI보험: ‘중대한’ 조건, 주계약 하나 받으면 나머지 소멸 여부</li><li>납입기간 · 담보별 갱신형 여부</li><li>보장기간 80 / 90 / 100세</li><li>갱신형: 앞으로 오를 보험료, 만기까지 총 납입액</li><li>저축·연금: 최저보증이율, 돈이 필요한 시점</li><li>운전자: 교통사고처리지원금 1억 이상, 벌금 3,000만, 변호사선임비 2,000만</li><li>변액: 해지환급금·수익률, 펀드 관리 여부</li><li>뇌·심장: 좁은 담보면 넓은 담보로 옮기기 제안</li><li>입원일당: 20세 미만 자녀는 5만원 이상, 성인은 우선순위 낮음</li></ul>'; }},
   {title:"보완할 곳 정리", html:function(){
-    var opn=S.ckOpen||{}, cc=S.ckc||{}, nd=lsNeedMap(), blank=[], narrow=[], plus=[], ok=0, held=0;
-    CKG.forEach(function(g){ if(!opn[g.g]) return; g.r.forEach(function(r){ var st=ckState(r[0]); if(st) held++;
-      if(st==="y") ok++;
-      if(st==="n") blank.push({nm:r[1],g:g.g,need:nd[r[0]]>=2});
-      if(st!=="n") (r[3]||[]).forEach(function(c,i){ if(cc[r[0]+"_"+i]==="n") narrow.push({nm:r[1],why:c[1]}); }); }); });
-    var used=Object.keys(opn).some(function(k){ return opn[k]; });
-    Object.keys(nd).forEach(function(id){ if(nd[id]<2||!COV[id]) return; var g=CK_G[id], inT=!!g&&(!used||opn[g]); if(!inT) plus.push(COV[id].nm); });
-    var total=blank.length+narrow.length+plus.length, sumAll=total+ok, cp=num(S.curPrem)||0, mx=num(S.maxPrem);
-    function seg(n,cls){ return n&&sumAll? '<i class="'+cls+'" style="flex:'+n+'"></i>' : ''; }
-    function col(t,cls,mark,items,f){ return '<section class="cl-sec '+cls+'"><header><span class="clm">'+mark+'</span><b>'+t+'</b><span class="cn num">'+items.length+'</span></header>'+(items.length?'<ul>'+items.map(f).join("")+'</ul>':'<p class="cl-none">없어요</p>')+'</section>'; }
-    return '<div class="slide cl-page">'+head("종합","지금 보험, 빈 곳이 얼마나 있었을까요?")+
-    '<div class="cl-hero"><div class="ch-l"><span class="ch-k">채워야 할 곳</span><b class="num">'+total+'<small>곳</small></b><span class="ch-d">'+(held?'확인한 담보 '+held+'개 중 잘 되어 있는 곳 '+ok+'개':'설계 비교에서 증권을 올리면 여기에 모여요')+'</span></div>'+
-      '<div class="ch-r"><div class="ch-bar">'+seg(blank.length,"n")+seg(narrow.length,"c")+seg(plus.length,"p")+seg(ok,"y")+(sumAll?'':'<i class="e" style="flex:1"></i>')+'</div>'+
-      '<div class="ch-lg"><span><i class="n"></i>빈칸 <b class="num">'+blank.length+'</b></span><span><i class="c"></i>보장 안 되는 경우 <b class="num">'+narrow.length+'</b></span><span><i class="p"></i>더 챙길 담보 <b class="num">'+plus.length+'</b></span><span><i class="y"></i>잘 되어 있음 <b class="num">'+ok+'</b></span></div></div></div>'+
-    (total? '<div class="cl-grid">'+
-      col("빈칸","n","✕",blank,function(x){ return '<li><b>'+x.nm+'</b><span>'+x.g+(x.need?' · <em>생활습관상 꼭 챙길 담보</em>':'')+'</span></li>'; })+
-      col("보장 안 되는 경우","c","!",narrow,function(x){ return '<li><b>'+x.nm+'</b><span>'+x.why+'</span></li>'; })+
-      col("더 챙길 담보","p","＋",plus,function(x){ return '<li><b>'+x+'</b><span>생활습관 검사 · 지금 보험에 없는 담보</span></li>'; })+
-    '</div><div class="cl-msg"><span class="cl-ic">✓</span><div><b>이 '+total+'곳, 빈틈없이 채워서 여러 보험사 상품으로 비교해 올게요</b><span>잘 되어 있는 '+ok+'곳은 그대로 두고, 필요한 곳만 보완해요.</span></div></div>'
-    : '<div class="ls-empty card"><b>아직 정리할 내용이 없어요</b><span class="d">설계 비교에서 고객 증권을 올리고, 생활습관 검사를 하면 여기에 모여요.</span></div>')+
+    var pol=S.pol||[], sel=planById(S.planSel)||autoPlan(), nd=lsNeedMap(), op=S.clOpen||{};
+    var d= pol.length&&sel? gapData(sel) : null, good=0, bad=0, grp=[];
+    function mg(L){ var out=[], idx={};
+      L.forEach(function(x){ var m= !x.t&&x.nm.match(/^(.+수술비) (\d)종$/);
+        if(m){ if(idx[m[1]]===undefined){ idx[m[1]]=out.length; out.push({nm:m[1],k:[m[2]],need:x.need}); } else { var o=out[idx[m[1]]]; o.k.push(m[2]); o.need=o.need||x.need; } }
+        else out.push(x); });
+      return out.map(function(o){ return o.k? {nm:o.nm+" "+o.k.join("·")+"종", need:o.need} : o; }); }
+    if(d) d.order.forEach(function(g){ var o=d.G[g], G=[], B=[];
+      o.rows.forEach(function(x){ var k=x.j.k, nm=kwNm(x.r[0]), need=nd[x.r[5]]>=2;
+        if(k==="ok") G.push({nm:nm});
+        else if(k==="sim") G.push({nm:nm, t:"이름이 달라요 · 약관 확인"});
+        else if(k==="low") B.push({nm:nm, need:need, t:"있지만 적어요 · 지금 "+wonTxt(x.j.cur)+" / 기준 "+wonTxt(x.r[3])});
+        else B.push({nm:nm, need:need}); });
+      G=mg(G); B=mg(B); good+=G.length; bad+=B.length; grp.push({g:g,G:G,B:B}); });
+    var gi={}; CKG.forEach(function(x){ gi[x.g]=x.ic; });
+    function chip(x,cls){ return '<li class="'+cls+'"><b>'+esc(x.nm)+'</b>'+(x.t?'<span>'+x.t+'</span>':'')+(x.need?'<em>생활습관상 꼭 챙길 담보</em>':'')+'</li>'; }
+    var list= grp.map(function(o){ var on=!!op[o.g], c=ANAL_C[o.g]||"var(--tc)";
+      return '<section class="cl-gp'+(on?' open':'')+'" style="--c:'+c+'"><button class="cl-gr" data-act="clOpen" data-v="'+esc(o.g)+'" aria-expanded="'+on+'">'+
+        '<span class="ic">'+ico(gi[o.g]||"total")+'</span><b>'+esc(o.g)+'</b>'+
+        '<span class="cl-gb">'+(o.G.length?'<i class="y" style="flex:'+o.G.length+'"></i>':'')+(o.B.length?'<i class="n" style="flex:'+o.B.length+'"></i>':'')+'</span>'+
+        '<span class="cl-gn"><em class="y">좋은 '+o.G.length+'</em><em class="n">없는 '+o.B.length+'</em></span><span class="cl-cv" aria-hidden="true"></span></button>'+
+        (on? '<div class="cl-gd"><div class="cl-col y"><span class="lb"><i>✓</i>좋은 담보</span>'+(o.G.length?'<ul>'+o.G.map(function(x){ return chip(x,"y"); }).join("")+'</ul>':'<p class="cl-none">아직 없어요</p>')+'</div>'+
+          '<div class="cl-col n"><span class="lb"><i>✕</i>없는 담보</span>'+(o.B.length?'<ul>'+o.B.map(function(x){ return chip(x,"n"); }).join("")+'</ul>':'<p class="cl-none">빈 곳 없이 잘 되어 있어요</p>')+'</div></div>' : '')+
+        '</section>'; }).join("");
+    var sumAll=good+bad, cp=num(S.curPrem)||0, mx=num(S.maxPrem);
+    return '<div class="slide cl-page">'+head("종합","지금 보험, 어디가 좋고 어디가 비어 있을까요?")+
+    (d? '<div class="cl-hero2"><div class="h2s y"><span>좋은 담보</span><b class="num">'+good+'<small>개</small></b><em>그대로 가져가요</em></div>'+
+        '<div class="h2s n"><span>없는 담보</span><b class="num">'+bad+'<small>개</small></b><em>여기만 채우면 돼요</em></div>'+
+        '<div class="h2bar">'+(good?'<i class="y" style="flex:'+good+'"></i>':'')+(bad?'<i class="n" style="flex:'+bad+'"></i>':'')+(sumAll?'':'<i class="e" style="flex:1"></i>')+'</div></div>'+
+      '<p class="cl-hint">묶음을 누르면 어떤 담보가 좋고, 어떤 담보가 없는지 나와요</p>'+
+      '<div class="cl-gps">'+list+'</div>'+
+      '<div class="cl-msg"><span class="cl-ic">✓</span><div><b>없는 '+bad+'개, 빈틈없이 채워서 여러 보험사 상품으로 비교해 올게요</b><span>좋은 '+good+'개는 그대로 두고, 없는 곳만 채워요.</span></div></div>'
+    : '<div class="ls-empty card"><b>아직 정리할 내용이 없어요</b><span class="d">설계 비교에서 고객 증권을 올리면 여기에 모여요.</span></div>')+
     '<div class="cl-wrap">'+    '<div class="cl-box"><h3>보험료, 한 달에 얼마까지 괜찮으세요?</h3>'+
       '<div class="cl-f"><label for="t-max">최대 보험료</label><div class="amt"><input id="t-max" data-s="maxPrem" inputmode="numeric" placeholder="0" value="'+esc(S.maxPrem)+'"><span>만원</span></div></div>'+
       '<div class="cl-f"><label for="t-cp">지금 내는 보험료</label><div class="amt"><input id="t-cp" data-s="curPrem" inputmode="numeric" placeholder="0" value="'+esc(S.curPrem)+'"><span>만원</span></div></div>'+
       '<div class="cl-res"><span>보완에 쓸 수 있는 돈 (월)</span><b class="num">'+(mx?bw(Math.max(0,mx-cp)):'—')+'</b></div></div>'+
       '<div class="cl-box cl-sch"><h3>다음 만남</h3>'+schHTML()+'</div></div></div>'; },
-   notes:function(){ return N("say","오늘 같이 보니까, 잘 되어 있는 곳도 있었지만 이만큼은 비어 있거나, 있어도 이런 때는 못 받는 상태였어요.")+
+   notes:function(){ return N("say","오늘 같이 보니까, 잘 되어 있는 담보도 이만큼 있었어요. 이건 그대로 가져가시면 돼요.")+N("say","다만 이 부분은 비어 있었어요. 여기만 채우면 돼요.")+
     N("q","이대로 두시면, 정작 필요할 때 제대로 못 받으실 수도 있는데 어떻게 느껴지세요?")+
     N("say","잘 되어 있는 곳은 그대로 두고요. 제가 이 부분까지 빈틈없이 보완해서, 여러 보험사 상품으로 비교해서 가져올게요.")+
     N("q","한 달 보험료는 어느 정도까지 괜찮으세요? (말씀하신 금액을 ‘최대 보험료’ 칸에)")+
     N("q","비교안 준비해서 언제 다시 뵐까요? (아래 ‘다음 만남’에서 날짜·시간 고르고 등록)")+
+    N("tip","좋은 담보부터 먼저 짚어 주세요. 잘된 것도 같이 보여야 빈 곳 얘기를 믿어요. 묶음은 접혀 있고, 누르면 좋은 담보 · 없는 담보가 펼쳐져요. ‘있지만 적어요’는 금액이 풀담보 기준보다 적은 담보예요.")+
     N("tip","숫자는 설계 비교에 올린 증권과 생활습관 검사 결과가 자동으로 모인 거예요. 일정은 이 아이패드에만 저장되고, 다른 고객 이름은 가운데를 가려서(김○○) 보여요. 실제로 못 받는 날은 ‘이 날 마감’으로 막아 두세요."); }},
   {title:"마무리", html:function(){
     var R=[["암","간암 평균 치료비 · 가장 큰 금액 기준","6,622만원","cancer","var(--t-cancer)"],["뇌혈관","뇌혈관질환 평균 치료비","5,132만원","brain","var(--t-brain)"],["심장","허혈성 심장질환 평균 치료비","4,800만원","heart","var(--t-heart)"],["수술","암·뇌·심장 수술 1회","500~1,000만원","surgery","var(--t-surgery)"],["후유장해","장해가 남았을 때 · 질병후유장해 기준 가입금액","5,000만원","disab","var(--t-disab)"]];
@@ -3950,6 +3998,7 @@ document.addEventListener("click",function(e){
   else if(a==="planAuto"){ S.planSel=""; S.planPick=false; S.planOn={}; render(); }
   else if(a==="planEdit"){ S.planEdit=!S.planEdit; render(); }
   else if(a==="pcStep"){ S.pcStep=+b.dataset.v; render(); setTimeout(function(){ var el=document.querySelector(".pc-steps"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },40); }
+  else if(a==="clOpen"){ S.clOpen=Object.assign({},S.clOpen); S.clOpen[b.dataset.v]=!S.clOpen[b.dataset.v]; render(); }
   else if(a==="gapOpen"){ S.gapOpen=Object.assign({},S.gapOpen); S.gapOpen[b.dataset.v]=!S.gapOpen[b.dataset.v]; render(); }
   else if(a==="planMgr"){ S.planMgr=!S.planMgr; render(); }
   else if(a==="planReset"){ S.planOn={}; render(); }
