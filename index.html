@@ -3267,7 +3267,7 @@ var RISK_PAGE={title:"일과 생활습관", html:function(){ var L=S.ls||{}, sec
    N("say","암·뇌·심장은 기본으로 챙기셨다고 보고요. 말씀하신 습관을 보면, 그 밖에 이런 병이 생길 가능성이 더 있어요. 꼭 걸린다는 뜻은 아니지만, 그만큼 이 담보를 실제로 쓰게 될 가능성이 큰 거죠.")+
    N("q","앞에서 증권으로 확인해 보니, 이 담보들은 어떻게 돼 있었죠? (증권을 올렸으면 담보 옆에 ✓·✕·?가 떠요)")+
    N("tip","캐묻는 느낌이 들지 않게, 고객이 편하게 말한 만큼만 눌러요. 흡연·음주·직업·검진 결과는 가입할 때 알릴 의무(고지)가 있는 항목이라, 설계 때도 사실대로 적어야 한다고 같이 안내해요. 현장직·운전직·이륜차는 직업·위험 등급 때문에 상해 담보 금액이 제한될 수 있어요.")+
-   N("tip","병은 이유가 많이 겹친 순서로 나와요. 담보 옆 ✓·✕·?는 설계 비교에 올린 증권 결과예요(✓ 충분 · ? 부족·다른 이름 · ✕ 없음). 하지정맥류·손목·대상포진·교통사고는 근거 수치를 확인하지 못해 설명만 넣었어요.")+
+   N("tip","병은 이유가 많이 겹친 순서로 나와요. 담보 옆 ✓·✕·?는 설계 비교에 올린 증권 결과예요(✓ 충분 · ? 부족 · ✕ 없음). 하지정맥류·손목·대상포진·교통사고는 근거 수치를 확인하지 못해 설명만 넣었어요.")+
    N("link","빈칸(✕)인 담보를 중심으로, 추가로 넣을 부분을 같이 정리해 볼게요."); }};
 
 /* ================= 보장분석 확인표 (체크식) ================= */
@@ -3554,8 +3554,7 @@ var TOTAL = [
     if(d) d.order.forEach(function(g){ var o=d.G[g], G=[], B=[];
       o.rows.forEach(function(x){ var k=x.j.k, nm=kwNm(x.r[0]), need=nd[x.r[5]]>=2;
         if(k==="ok") G.push({nm:nm});
-        else if(k==="sim") G.push({nm:nm, t:"이름이 달라요 · 약관 확인"});
-        else if(k==="low") B.push({nm:nm, need:need, t:"있지만 적어요 · 지금 "+wonTxt(x.j.cur)+" / 기준 "+wonTxt(x.r[3])});
+                else if(k==="low") B.push({nm:nm, need:need, t:"있지만 적어요 · 지금 "+wonTxt(x.j.cur)+" / 기준 "+wonTxt(x.r[3])});
         else B.push({nm:nm, need:need}); });
       G=mg(G); B=mg(B); good+=G.length; bad+=B.length; grp.push({g:g,G:G,B:B}); });
     var gi={}; CKG.forEach(function(x){ gi[x.g]=x.ic; });
@@ -3641,7 +3640,7 @@ function amtWon(s){ var m=AMT_RE.exec((s||"").replace(/\s/g,"")); if(!m) return 
 function wonTxt(w){ if(!w) return "—"; if(w>=1e8){ var e=Math.floor(w/1e8), m=Math.round((w%1e8)/1e4); return e+"억"+(m?" "+m.toLocaleString("ko-KR")+"만":"")+"원"; } if(w>=1e4) return (Math.round(w/1e4)).toLocaleString("ko-KR")+"만원"; return w.toLocaleString("ko-KR")+"원"; }
 function isSpaced(s){ var t=s.trim(); if(t.length<5) return false; var parts=t.split(" "); var ones=parts.filter(function(p){ return p.length===1; }).length; return ones>=parts.length*0.7&&parts.length>=3; }
 function cleanName(s){ return s.replace(/\s+/g,"").replace(/[()]/g,function(c){ return c; }); }
-function normKey(s){ return (s||"").replace(/\s+/g,"").replace(/\((건강고지형|추가고지형|간편고지형|일반고지형|[0-9]+년고지형|갱신형[^)]*|감액없음|연간\d+회한|수술당|최초\d+회)\)/g,"").replace(/[ⅠⅡⅢⅣⅤ]/g,"").replace(/\[갱신형\]/g,""); }
+function normKey(s){ return (s||"").replace(/\s+/g,"").replace(/호르몬치료제외/g,"호르몬제외").replace(/\((건강고지형|추가고지형|간편고지형|일반고지형|[0-9]+년고지형|갱신형[^)]*|감액없음|연간\d+회한|치료별\s*연간\d+회한|수술당|치료별|최초\d+회)\)/g,"").replace(/[ⅠⅡⅢⅣⅤ]/g,"").replace(/\[갱신형\]/g,""); }
 var MAP_RULES=[[/리셋월렛|고액치료/,""],[/납입면제/,"nm1"],[/질병후유장해/,"di1"],[/상해후유장해|재해장해/,"di2"],[/치매|장기요양/,"x_dem"],[/간병/,"di3"],
  [/골절/,"ba3"],[/항암|방사선치료|중입자|양성자/,"ca6"],[/암수술/,"ca6s"],[/암.*주요치료|암중환자실/,"ca7"],
  [/5회지급|재진단|계속받는|2차암|전이암/,"ca3"],[/고액암/,"ca5"],[/유사암(?!제외)/,"ca2"],[/암진단/,"ca1"],
@@ -3712,11 +3711,12 @@ function autoPlan(){ var L=planList(), a=+S.cAge||0; if(!L.length) return null; 
 function planList(){ var L=Array.isArray(cfg.plans)? cfg.plans : []; if(!L.length&&!CFG_T.plans&&window.BUILTIN_PLANS) return window.BUILTIN_PLANS; return L; }
 function planById(id){ return planList().filter(function(p){ return p.id===id; })[0]; }
 function polRows(){ var out=[]; (S.pol||[]).forEach(function(p){ p.rows.forEach(function(r){ out.push(r); }); }); return out; }
+function coreKey(n){ return normKey(n).replace(/^.*_/,"").replace(/\([^)]*\)/g,""); }
 function judge(r){ /* r: 풀담보 담보 [nm,cat,term,amt,prem,id,on] */
   var pr=polRows(), key=normKey(r[0]), same=pr.filter(function(x){ return x.key===key; }), have=same.reduce(function(s,x){ return s+x.amt; },0);
   if(same.length){ return have>=r[3]? {k:"ok",t:"충분",cur:have} : {k:"low",t:"부족",cur:have}; }
-  var sim=r[5]? pr.filter(function(x){ return x.id===r[5]; }) : [];
-  if(sim.length) return {k:"sim",t:"비슷한 담보 있음",cur:0,sim:sim.length};
+  var core=coreKey(r[0]), near=r[5]? pr.filter(function(x){ return x.id===r[5]&&coreKey(x.nm)===core; }) : [], nh=near.reduce(function(s,x){ return s+x.amt; },0);
+  if(near.length){ return nh>=r[3]? {k:"ok",t:"충분",cur:nh} : {k:"low",t:"부족",cur:nh}; }
   if(pr.length) return {k:"no",t:"없음",cur:0};
   var st=r[5]? ckState(r[5]) : "";
   if(st==="y") return {k:"sim",t:"보장분석: 있음",cur:0};
@@ -3743,7 +3743,7 @@ function planHTML(){
   if(pol.length&&sel) ckFromPol(sel);
   var cmp='';
   if(sel&&(pol.length||S.planEdit)){ var edit=!!S.planEdit, inc=0, cnt=0, groups={}, order=[];
-    sel.rows.forEach(function(r,i){ if(!edit&&!r[6]) return; var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타";
+    sel.rows.forEach(function(r,i){ if(!edit&&!r[6]) return; var j=judge(r), on=edit? !!r[6] : planOn(sel,i,j), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "기타"; if(/^ca/.test(r[5]||"")&&g==="주요치료비") g="암"; else if(r[5]==="he5") g="뇌·심장";
       if(!groups[g]){ groups[g]=[]; order.push(g); } groups[g].push({r:r,i:i,j:j,on:on}); if(on){ inc+=r[4]||0; cnt++; } });
     var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
     var full=sel.rows.reduce(function(s,r){ return s+(r[6]?(r[4]||0):0); },0), mx=num(S.maxPrem), cp=num(S.curPrem)||0, room=mx? Math.max(0,mx-cp)*10000 : 0;
@@ -3752,11 +3752,11 @@ function planHTML(){
       '<span class="pc-auto">'+(S.planPick? '직접 고른 풀담보 · <button class="lnk" data-act="planAuto">나이에 맞춰 고르기</button>' : (S.cAge? '나이에 가장 가까운 풀담보로 자동 비교 중' : '증권을 올리면 나이를 읽어서 맞는 풀담보를 골라요'))+'</span></div>';
     cmp='<div class="pc-cmp">'+who+'<div class="pc-ch"><div><b>'+esc(sel.ins)+' · '+esc(shortNm(sel.prod))+(sel.age?' <small>기준 '+sel.age+'세 '+(sel.sex||"")+'</small>':'')+'</b><span>'+(edit?'풀담보에 넣을 담보를 골라요 · 바꾸면 다음 고객에게도 그대로 써요':'고객 보험과 나란히 놓고, 필요 없는 담보를 빼요')+'</span></div>'+
       '<div class="pc-tools"><button class="ghost" data-act="planEdit" aria-pressed="'+edit+'">'+(edit?'다 고쳤어요':'풀담보 고치기')+'</button>'+(edit?'<button class="ghost danger" data-act="planDel" data-v="'+sel.id+'">이 풀담보 지우기</button>':'<button class="ghost" data-act="planReset">처음 상태로</button>')+'</div></div>'+
-      (edit?'':'<div class="pc-crit sm"><span><i class="ok"></i>충분 · 이미 있어서 꺼 둠</span><span><i class="low"></i>부족 · 있지만 적음</span><span><i class="no"></i>없음</span><span><i class="sim"></i>다른 이름으로 있음 · 약관 확인</span><span>스위치를 끄면 그 담보를 빼고 다시 계산해요</span></div>')+
+      (edit?'':'<div class="pc-crit sm"><span><i class="ok"></i>충분 · 이미 있어서 꺼 둠</span><span><i class="low"></i>부족 · 있지만 적음</span><span><i class="no"></i>없음</span><span>스위치를 끄면 그 담보를 빼고 다시 계산해요</span></div>')+
       '<div class="pc-head"><span>담보</span><span>풀담보</span><span>고객 지금</span><span>판단</span><span>보험료</span><span></span></div>'+
       order.map(function(g){ return '<div class="pc-g"><h4>'+esc(g)+'</h4>'+groups[g].map(function(o){ var r=o.r, j=o.j;
         return '<div class="pc-r'+(o.on?' on':'')+'"><span class="pc-nm"><b>'+esc(shortNm(r[0]))+'</b>'+(r[2]?'<small>'+esc(r[2])+'</small>':'')+'</span><span class="num">'+wonTxt(r[3])+'</span>'+
-          '<span class="num pc-cur">'+(j.cur?wonTxt(j.cur):(j.k==="sim"?'비슷한 담보':'—'))+'</span>'+
+          '<span class="num pc-cur">'+(j.cur?wonTxt(j.cur):'—')+'</span>'+
           '<span>'+(edit?'':(j.t?'<em class="pc-j '+j.k+'">'+j.t+'</em>':''))+'</span><span class="num">'+(r[4]?r[4].toLocaleString("ko-KR")+'원':'')+'</span>'+
           '<button class="pc-sw" role="switch" aria-checked="'+o.on+'" data-act="'+(edit?'planDef':'planTog')+'" data-v="'+o.i+'" aria-label="'+esc(shortNm(r[0]))+'"><i></i></button></div>'; }).join("")+'</div>'; }).join("")+
       '<div class="pc-sum"><div><span>선택한 담보</span><b class="num">'+cnt+'개</b></div><div><span>월 보험료 (대략)</span><b class="num">약 '+inc.toLocaleString("ko-KR")+'원</b></div><div><span>풀담보 대비</span><b class="num">'+(full-inc>0?'−'+(full-inc).toLocaleString("ko-KR")+'원':'0원')+'</b></div>'+
@@ -3771,13 +3771,13 @@ function pcStepNav(st){ var L=[["1","부족한 곳"],["2","이대로 가면"],["
   return '<div class="pc-steps">'+L.map(function(x){ var n=+x[0]; return '<button class="pc-st'+(st===n?' on':'')+(st>n?' done':'')+'" data-act="pcStep" data-v="'+n+'" aria-pressed="'+(st===n)+'"><i>'+(st>n?'✓':n)+'</i><b>'+x[1]+'</b></button>'; }).join('<span class="pc-stl" aria-hidden="true"></span>')+'</div>'; }
 function rowRatio(r,j){ if(j.k==="ok") return 1; if(j.k==="low") return Math.min(1,j.cur/(r[3]||1)); if(j.k==="no") return 0; return null; }
 function gapData(sel){ var G={}, order=[], tot=0, n=0;
-  sel.rows.forEach(function(r){ if(!r[6]) return; var j=judge(r), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "그 외", q=rowRatio(r,j); if(/^ca/.test(r[5]||"")) g="암";
+  sel.rows.forEach(function(r){ if(!r[6]) return; var j=judge(r), g=r[5]&&COV_NM[r[5]]? COV_NM[r[5]].g : "그 외", q=rowRatio(r,j); if(/^ca/.test(r[5]||"")) g="암"; else if(r[5]==="he5") g="뇌·심장";
     if(!G[g]){ G[g]={rows:[],sum:0,n:0,no:0,low:0,ok:0,sim:0}; order.push(g); }
     var o=G[g]; o.rows.push({r:r,j:j,q:q}); if(q!==null){ o.sum+=q; o.n++; tot+=q; n++; } o[j.k==="e"?"no":j.k]++; });
   var GO=CKG.map(function(g){ return g.g; }); order.sort(function(p,q){ var a=GO.indexOf(p), b=GO.indexOf(q); return (a<0?99:a)-(b<0?99:b); });
   return {G:G, order:order, pct: n? Math.round(tot/n*100) : 0}; }
 function gapHTML(sel){ var d=gapData(sel), op=S.gapOpen||{};
-  var crit='<div class="pc-crit"><b>판단 기준</b><span>풀담보 설계의 담보와 금액이 100%예요.</span><span><i class="ok"></i>충분 · 같은 담보가 그 금액 이상</span><span><i class="low"></i>부족 · 있지만 금액이 적음</span><span><i class="no"></i>없음 · 아예 없음</span><span><i class="sim"></i>다른 이름으로 있음 · 약관 확인</span></div>';
+  var crit='<div class="pc-crit"><b>판단 기준</b><span>풀담보 설계의 담보와 금액이 100%예요.</span><span><i class="ok"></i>충분 · 같은 담보가 그 금액 이상</span><span><i class="low"></i>부족 · 있지만 금액이 적음</span><span><i class="no"></i>없음 · 아예 없음</span></div>';
   var hero='<div class="pc-ghero"><div class="ring-w">'+ckRing(d.pct/100, d.pct+'<small>%</small>', '준비됨')+'</div><div><span class="k">풀담보와 비교하면</span><b>지금 보험은 '+d.pct+'% 준비돼 있어요</b><span class="d">빈 곳 '+d.order.reduce(function(s,g){ return s+d.G[g].no; },0)+'개 · 부족한 곳 '+d.order.reduce(function(s,g){ return s+d.G[g].low; },0)+'개</span></div></div>';
   var cards='<div class="pc-gaps">'+d.order.map(function(g){ var o=d.G[g], p=o.n? Math.round(o.sum/o.n*100) : null, lv= p===null?"sim": p>=100?"ok": p===0?"no":"low";
     var by=function(k){ return o.rows.filter(function(x){ return x.j.k===k; }); };
@@ -3807,7 +3807,8 @@ function kwNm(n){ n=(n||"").replace(/^\[갱신형\]/,"").replace(/\((건강|추�
   if(/^보험료\s*납입면제/.test(n)) return "보험료 납입면제";
   if(/리셋월렛/.test(n)) return "리셋월렛 (3대질병 고액치료·간병)";
   if((m=n.match(/^통합심장\((.+)\)진단비$/))){ var x=m[1].replace(/^특정심혈관질환\((.+)\)$/,"$1"); return x+" 진단비"; }
-  if((m=n.match(/^순환계질환[^_]*_(.+)$/))) return "순환계 "+m[1];
+  if((m=n.match(/^순환계질환[^_]*_(.+)$/))){ var t=m[1];
+    return "뇌·심장 치료 · "+( /^수술비/.test(t)?"수술" : /^혈전제거/.test(t)?"혈전제거" : /^뇌혈관.*혈전용해/.test(t)?"뇌 혈전용해" : /^심혈관.*혈전용해/.test(t)?"심장 혈전용해" : /^중환자실/.test(t)?"중환자실" : t.replace(/치료비.*$/,"")); }
   if((m=n.match(/^암주요치료비[^_]*_(.+)$/))) return m[1];
   if(/^암주요치료비\(유사암\)/.test(n)) return "유사암 주요치료비";
   if((m=n.match(/^(질병|상해)1~5종수술비\((\d)종\)$/))) return m[1]+" 1~5종 수술비 "+m[2]+"종";
@@ -3824,7 +3825,7 @@ var PLAN_PAGE={title:"설계 비교", html:planHTML,
     N("q","① 풀담보를 100%로 보면, 지금 보험은 몇 % 준비돼 있을까요?")+
     N("q","② 이대로 가다 암 진단을 받으면, 모자란 돈은 어디서 마련하실 건가요?")+
     N("say","③ 풀담보로 다 채우면 가장 든든하지만, 매달 부담될 수 있어요. 풀담보를 기준으로 하나씩 같이 빼 볼게요.")+
-    N("tip","‘충분’은 같은 이름의 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. ‘비슷한 담보’는 이름은 다르지만 같은 종류라, 약관 범위를 보고 직접 판단해요.")+
+    N("tip","‘충분’은 같은 담보가 이미 그 금액 이상 있다는 뜻이라 처음부터 꺼져 있어요. 보험사마다 개정 회차(Ⅱ·Ⅳ)나 괄호 표기가 달라도 같은 담보로 맞춰서 비교해요.")+
     N("tip","고객 증권은 저장하지 않아요. 풀담보 설계는 폰·아이패드에 같이 저장돼서 계속 남아 있어요(고객 이름·설계번호는 저장 안 함).")+
     N("tip","실손은 증권의 가입일(계약일)을 ‘실손 가입일’ 칸에 넣으면 세대와 지금 불리한 점이 나와요. 넣으면 실손 ‘되어 있음’과 세대 기준(1·2세대면 보장)이 자동으로 체크돼요. 2009년 8~9월 가입은 보험사마다 표준화 시점이 달라 증권의 자기부담률로 세대를 확인해요.")+N("tip","1세대·초기 2세대(2013년까지)는 5세대로 바꾸면 3년간 보험료 50% 할인이 있어요(2026년 5월~). 다만 1세대는 자기부담이 거의 없어서 병원을 자주 가는 분은 유지가 나을 수 있어요. 바꿀지는 고객이 직접 따져 보게 하고, 좋은 점도 같이 말해 주기."); }};
 function pdfUpload(kind, files){ if(!files||!files.length) return; S.pdfBusy=true; S.pdfErr=""; render();
